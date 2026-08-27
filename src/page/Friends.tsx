@@ -10,7 +10,7 @@ const Friends = () => {
       <div className="space-y-2 py-3">
         <InviteCard title="Invite a friend" profit="343,3432" />
         <InviteCard
-          title="Invite a friend with Telegram Preminum"
+          title="Invite a friend with Telegram Premium"
           profit="5000"
         />
       </div>
