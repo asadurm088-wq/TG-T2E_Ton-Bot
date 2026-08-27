@@ -32,31 +32,31 @@ const Friends = () => {
       <div className="mt-3 space-y-2">
         <FriendCard
           name="Lari0 | FutureValueApp"
-          role="Platium"
+          role="Platinum"
           profit="495.3K"
           value="+321K"
         />
         <FriendCard
           name="Dan Ber"
-          role="Platium"
+          role="Platinum"
           profit="445.3K"
           value="+25K"
         />
         <FriendCard
           name="Lari0 | FutureValueApp"
-          role="Platium"
+          role="Platinum"
           profit="495.3K"
           value="+321K"
         />
         <FriendCard
           name="Dan Ber"
-          role="Platium"
+          role="Platinum"
           profit="445.3K"
           value="+25K"
         />
-        <FriendCard name="Andria" role="Platium" profit="435.3K" value="+35K" />
+        <FriendCard name="Andria" role="Platinum" profit="435.3K" value="+35K" />
       </div>
     </div>
   );
 };
-export default Friends;
+export default Friends
