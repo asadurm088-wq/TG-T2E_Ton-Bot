@@ -1,4 +1,4 @@
-import CheckCom from "../component/ch";
+import CheckCom from "../component/Ch";
 
 export default function Airdrop() {
   return (
@@ -58,6 +58,3 @@ export default function Airdrop() {
     </div>
   );
 }
-
-
-
