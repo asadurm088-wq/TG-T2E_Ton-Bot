@@ -67,17 +67,19 @@ export default function Airdrop() {
 
             <h2 className="text-xl font-bold text-center text-white mb-4">Withdraw Cash</h2>
 
-            {/* সর্বনিম্ন উত্তোলনের নোটিশ */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl mb-4 text-center">
+            {/* সর্বনিম্ন উত্তোলন ও ২৪ ঘণ্টার পেমেন্ট নোটিশ */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl mb-4 text-center flex flex-col gap-1">
               <p className="text-xs text-yellow-400 font-semibold">
                 ⚠️ সর্বনিম্ন উত্তোলন: {minWithdrawLimit} ইউএসডি (USD)
               </p>
-              <p className="text-[11px] text-gray-400 mt-0.5">২-৩ দিন কাজ করে ব্যালেন্স ১০ ইউএসডি করুন।</p>
+              <p className="text-[11px] text-gray-300">
+                ⏱️ উত্তোলনের আবেদন সফল হওয়ার পর <span className="text-yellow-400 font-bold">২৪ ঘণ্টার মধ্যে</span> পেমেন্ট আপনার অ্যাকাউন্টে পৌঁছে যাবে।
+              </p>
             </div>
 
             {success ? (
               <div className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-xl text-center font-bold">
-                ✅ সফলভাবে উত্তোলনের আবেদন জমা হয়েছে!
+                ✅ সফলভাবে উত্তোলনের আবেদন জমা হয়েছে! ২৪ ঘণ্টার মধ্যে পেমেন্ট পেয়ে যাবেন।
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
