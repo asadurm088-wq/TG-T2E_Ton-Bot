@@ -1,6 +1,6 @@
 import CheckCom from "../component/ch";
 
-const Airdrop = () => {
+export default function Airdrop() {
   return (
     <div className="py-10 bg-black p-4 flex flex-col items-center min-h-screen text-center">
       <div className="ml-2">
@@ -16,18 +16,18 @@ const Airdrop = () => {
         <a 
           href="/withdraw"
           style={{
-            display: 'inline-block',
-            marginTop: '20px',
-            marginBottom: '30px',
-            padding: '14px 28px',
-            backgroundColor: '#3b82f6',
-            color: '#fff',
-            textDecoration: 'none',
-            borderRadius: '12px',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)'
+            display: "inline-block",
+            marginTop: "20px",
+            marginBottom: "30px",
+            padding: "14px 28px",
+            backgroundColor: "#3b82f6",
+            color: "#fff",
+            textDecoration: "none",
+            borderRadius: "12px",
+            fontSize: "18px",
+            fontWeight: "bold",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)"
           }}
         >
           Withdraw Cash
@@ -57,8 +57,7 @@ const Airdrop = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Airdrop;
 
 
