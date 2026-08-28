@@ -1,146 +1,125 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function Airdrop() {
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [method, setMethod] = useState("");
+  const [method, setMethod] = useState("bKash");
   const [number, setNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [success, setSuccess] = useState(false);
 
+  // সর্বনিম্ন উত্তোলনের শর্ত (১০ ইউএসডি)
+  const minWithdrawLimit = 10.00; 
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!method || !number || !amount) {
       alert("দয়া করে সব তথ্য পূরণ করুন!");
       return;
     }
+
+    const withdrawAmount = parseFloat(amount);
+
+    if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
+      alert("সঠিক অ্যামাউন্ট লিখুন!");
+      return;
+    }
+
+    // ১০ ইউএসডি এর কম হলে উইথড্র আটকানোর শর্ত
+    if (withdrawAmount < minWithdrawLimit) {
+      alert(`সর্বনিম্ন উত্তোলন সীমা হলো ${minWithdrawLimit} ইউএসডি (USD)! অন্তত ২-৩ দিন কাজ করে ব্যালেন্স ১০ ইউএসডি পূরণ করুন।`);
+      return;
+    }
+
     setSuccess(true);
     setTimeout(() => {
       setSuccess(false);
       setShowWithdraw(false);
       setNumber("");
       setAmount("");
-      setMethod("");
     }, 3000);
   };
 
   return (
-    <div className="py-10 bg-black p-4 flex flex-col items-center min-h-screen text-center relative">
-      <div className="ml-2 w-full max-w-md">
-        <div className="flex justify-center mb-4">
-          <img src="image/hamstercoin.png" alt="coin" className="w-20 h-20" />
-        </div>
-        <p className="text-white text-2xl font-bold mb-6">
-          Get ready, Airdrop is
-          <br /> coming soon!
-        </p>
-
-        {/* উইথড্র ক্যাশ বাটন */}
-        <button 
-          onClick={() => setShowWithdraw(true)}
-          style={{
-            display: "inline-block",
-            marginTop: "20px",
-            marginBottom: "30px",
-            padding: "14px 28px",
-            backgroundColor: "#3b82f6",
-            color: "#fff",
-            textDecoration: "none",
-            borderRadius: "12px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)",
-            border: "none",
-            width: "100%"
-          }}
-        >
-          Withdraw Cash
-        </button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 pb-24">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-yellow-500 mb-2">Airdrop & Withdraw</h1>
+        <p className="text-gray-400 text-sm">সম্পূর্ণ কাজ শেষ করে আপনার পেমেন্ট তুলুন।</p>
       </div>
 
-      <div className="mt-2 w-full max-w-md">
-        <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
-          <p className="text-white ml-3 text-left">Exchange negotiations</p>
-        </div>
-        
-        <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
-          <p className="text-white ml-3 text-left">Market Maker negotiations</p>
-        </div>
+      <button
+        onClick={() => setShowWithdraw(true)}
+        className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-xl shadow-lg transition duration-200 cursor-pointer"
+      >
+        Withdraw Cash
+      </button>
 
-        <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
-          <p className="text-white ml-3 text-left">Key partnerships are coming</p>
-        </div>
-
-        <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <span style={{ color: "#ef4444", fontSize: "20px", marginRight: "10px" }}>✖</span>
-          <p className="text-white ml-3 text-left">Airdrop task list</p>
-        </div>
-      </div>
-
-      {/* উইথড্র পপআপ বক্স */}
+      {/* উইথড্র পপআপ মডাল */}
       {showWithdraw && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 flex flex-col justify-center items-center p-4 z-50">
-          <div className="bg-zinc-900 p-6 rounded-2xl w-full max-w-md text-left relative border border-zinc-700 shadow-2xl">
-            <button 
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md p-6 rounded-3xl relative shadow-2xl">
+            <button
               onClick={() => setShowWithdraw(false)}
-              className="absolute top-4 right-4 text-white text-xl font-bold bg-zinc-800 px-3 py-1 rounded-full"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold"
             >
               ✕
             </button>
-            <h2 className="text-white text-2xl font-bold mb-4 text-center">Withdraw Cash</h2>
-            
+
+            <h2 className="text-xl font-bold text-center text-white mb-4">Withdraw Cash</h2>
+
+            {/* সর্বনিম্ন উত্তোলনের নোটিশ */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 p-3 rounded-xl mb-4 text-center">
+              <p className="text-xs text-yellow-400 font-semibold">
+                ⚠️ সর্বনিম্ন উত্তোলন: {minWithdrawLimit} ইউএসডি (USD)
+              </p>
+              <p className="text-[11px] text-gray-400 mt-0.5">২-৩ দিন কাজ করে ব্যালেন্স ১০ ইউএসডি করুন।</p>
+            </div>
+
             {success ? (
-              <div className="bg-green-600 text-white p-4 rounded-xl text-center font-bold">
-                অভিনন্দন! আপনার উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে।
+              <div className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-xl text-center font-bold">
+                ✅ সফলভাবে উত্তোলনের আবেদন জমা হয়েছে!
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">পেমেন্ট মেথড বেছে নিন</label>
-                  <select 
-                    value={method} 
+                  <label className="text-xs text-gray-400 block mb-1">পেমেন্ট মেথড বেছে নিন</label>
+                  <select
+                    value={method}
                     onChange={(e) => setMethod(e.target.value)}
-                    className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
+                    className="w-full bg-black border border-zinc-700 text-white p-3 rounded-xl outline-none text-sm"
                   >
-                    <option value="">-- এক্সচেঞ্জ / মেথড সিলেক্ট করুন --</option>
-                    <option value="Binance">Binance (UID / USDT)</option>
-                    <option value="Bitget">Bitget (UID / USDT)</option>
-                    <option value="Bybit">Bybit (UID / USDT)</option>
-                    <option value="USDT_TRC20">USDT (TRC20 Address)</option>
                     <option value="bKash">বিকাশ (bKash)</option>
                     <option value="Nagad">নগদ (Nagad)</option>
-                    <option value="Rocket">রকেট (Rocket)</option>
+                    <option value="USDT">USDT (TRC20 / TON)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">UID / ওয়ালেট এড্রেস / নাম্বার</label>
-                  <input 
-                    type="text" 
-                    placeholder="আপনার UID বা ওয়ালেট নাম্বার দিন"
+                  <label className="text-xs text-gray-400 block mb-1">UID / ওয়ালেট এড্রেস / নম্বর</label>
+                  <input
+                    type="text"
+                    placeholder="আপনার UID বা ওয়ালেট নম্বর দিন"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
+                    className="w-full bg-black border border-zinc-700 text-white p-3 rounded-xl outline-none text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">পরিমাণ (Amount)</label>
-                  <input 
-                    type="number" 
-                    placeholder="টোকেন বা অ্যামাউন্ট লিখুন"
+                  <label className="text-xs text-gray-400 block mb-1">পরিমাণ (Amount in USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="কমপক্ষে ১০ ইউএসডি লিখুন"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
+                    className="w-full bg-black border border-zinc-700 text-white p-3 rounded-xl outline-none text-sm"
                   />
                 </div>
 
-                <button 
+                <button
                   type="submit"
-                  className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg mt-2 cursor-pointer shadow-lg"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition duration-200 mt-2 cursor-pointer"
                 >
                   Confirm Withdraw
                 </button>
