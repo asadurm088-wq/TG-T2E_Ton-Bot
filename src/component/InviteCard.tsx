@@ -5,20 +5,20 @@ interface InviteCardProps {
   profit: string;
 }
 
-const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
-  const [copied, setCopied] = useState(false);
+export default function InviteCard({ title, profit }: InviteCardProps) {
+  const [copied, setCopied] = useState<boolean>(false);
 
-  const tg = (window as any).Telegram?.WebApp;
+  const tg = typeof window !== 'undefined' ? (window as any).Telegram?.WebApp : null;
   const userId = tg?.initDataUnsafe?.user?.id || 'guest';
   const botUsername = "IncomingCashOfficial_bot";
   const botUrl = `https://t.me/${botUsername}?start=${userId}`;
 
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation(); // কার্ডের মেইন ক্লিক যেন ফায়ার না হয়
+  const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     navigator.clipboard.writeText(botUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    }).catch(() => {});
   };
 
   const handleInvite = () => {
@@ -42,7 +42,6 @@ const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
           </div>
         </div>
         
-        {/* রেফারেল লিংক দেখানোর বক্স এবং কপি বাটন */}
         <div className="flex items-center bg-[#1a1c23] rounded p-2 mt-1 border border-gray-700" onClick={(e) => e.stopPropagation()}>
           <input 
             type="text" 
@@ -51,6 +50,7 @@ const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
             className="bg-transparent text-xs text-gray-300 w-full outline-none px-1 truncate"
           />
           <button 
+            type="button"
             onClick={handleCopy}
             className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 rounded ml-2 transition"
           >
@@ -60,7 +60,6 @@ const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
       </div>
     </div>
   );
-};
+}
 
-export default InviteCard;
 
