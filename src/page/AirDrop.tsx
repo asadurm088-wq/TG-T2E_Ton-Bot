@@ -2,24 +2,24 @@ import { useState } from "react";
 
 export default function Airdrop() {
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
+  const [method, setMethod] = useState("");
+  const [number, setNumber] = useState("");
   const [amount, setAmount] = useState("");
-  const [successMsg, setSuccessMsg] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleWithdraw = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedMethod || !accountNumber || !amount) {
+    if (!method || !number || !amount) {
       alert("দয়া করে সব তথ্য পূরণ করুন!");
       return;
     }
-    setSuccessMsg(true);
+    setSuccess(true);
     setTimeout(() => {
-      setSuccessMsg(false);
+      setSuccess(false);
       setShowWithdraw(false);
-      setAccountNumber("");
+      setNumber("");
       setAmount("");
-      setSelectedMethod("");
+      setMethod("");
     }, 3000);
   };
 
@@ -80,32 +80,36 @@ export default function Airdrop() {
         </div>
       </div>
 
-      {/* উইথড্র ফর্ম বা মোডাল */}
+      {/* উইথড্র পপআপ বক্স */}
       {showWithdraw && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex flex-col justify-center items-center p-4 z-50">
-          <div className="bg-zinc-900 p-6 rounded-2xl w-full max-w-md text-left relative border border-zinc-800">
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex flex-col justify-center items-center p-4 z-50">
+          <div className="bg-zinc-900 p-6 rounded-2xl w-full max-w-md text-left relative border border-zinc-700 shadow-2xl">
             <button 
               onClick={() => setShowWithdraw(false)}
-              className="absolute top-4 right-4 text-white text-xl font-bold"
+              className="absolute top-4 right-4 text-white text-xl font-bold bg-zinc-800 px-3 py-1 rounded-full"
             >
               ✕
             </button>
-            <h2 className="text-white text-xl font-bold mb-4 text-center">Withdraw Cash</h2>
+            <h2 className="text-white text-2xl font-bold mb-4 text-center">Withdraw Cash</h2>
             
-            {successMsg ? (
+            {success ? (
               <div className="bg-green-600 text-white p-4 rounded-xl text-center font-bold">
-                সফল হয়েছে! আপনার উইথড্র রিকোয়েস্ট গ্রহণ করা হয়েছে।
+                অভিনন্দন! আপনার উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে।
               </div>
             ) : (
-              <form onSubmit={handleWithdraw} className="flex flex-col gap-4">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">পেমেন্ট মেথড সিলেক্ট করুন</label>
+                  <label className="text-gray-300 text-sm mb-1 block">পেমেন্ট মেথড বেছে নিন</label>
                   <select 
-                    value={selectedMethod} 
-                    onChange={(e) => setSelectedMethod(e.target.value)}
+                    value={method} 
+                    onChange={(e) => setMethod(e.target.value)}
                     className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
                   >
-                    <option value="">-- মেথড বেছে নিন --</option>
+                    <option value="">-- এক্সচেঞ্জ / মেথড সিলেক্ট করুন --</option>
+                    <option value="Binance">Binance (UID / USDT)</option>
+                    <option value="Bitget">Bitget (UID / USDT)</option>
+                    <option value="Bybit">Bybit (UID / USDT)</option>
+                    <option value="USDT_TRC20">USDT (TRC20 Address)</option>
                     <option value="bKash">বিকাশ (bKash)</option>
                     <option value="Nagad">নগদ (Nagad)</option>
                     <option value="Rocket">রকেট (Rocket)</option>
@@ -113,21 +117,21 @@ export default function Airdrop() {
                 </div>
 
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">একাউন্ট নাম্বার</label>
+                  <label className="text-gray-300 text-sm mb-1 block">UID / ওয়ালেট এড্রেস / নাম্বার</label>
                   <input 
                     type="text" 
-                    placeholder="আপনার নাম্বার দিন"
-                    value={accountNumber}
-                    onChange={(e) => setAccountNumber(e.target.value)}
+                    placeholder="আপনার UID বা ওয়ালেট নাম্বার দিন"
+                    value={number}
+                    onChange={(e) => setNumber(e.target.value)}
                     className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
                   />
                 </div>
 
                 <div>
-                  <label className="text-gray-300 text-sm mb-1 block">টাকার পরিমাণ</label>
+                  <label className="text-gray-300 text-sm mb-1 block">পরিমাণ (Amount)</label>
                   <input 
                     type="number" 
-                    placeholder="পরিমাণ লিখুন"
+                    placeholder="টোকেন বা অ্যামাউন্ট লিখুন"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="w-full p-3 bg-black text-white rounded-lg border border-zinc-700"
@@ -136,7 +140,7 @@ export default function Airdrop() {
 
                 <button 
                   type="submit"
-                  className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg mt-2 cursor-pointer"
+                  className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg mt-2 cursor-pointer shadow-lg"
                 >
                   Confirm Withdraw
                 </button>
