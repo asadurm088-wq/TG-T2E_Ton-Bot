@@ -1,64 +1,112 @@
-import EarnCard from "../component/EarnCard";
-const Earn = () => {
+import { useState } from "react";
+
+export default function Earn() {
+  const [tasks, setTasks] = useState([
+    { 
+      id: 1, 
+      title: "Join Telegram Channel", 
+      reward: 5000, 
+      link: "https://t.me/RakibEarningZoneBD", 
+      status: "Go" 
+    },
+    { 
+      id: 2, 
+      title: "YouTube Subscribe & Watch", 
+      reward: 3000, 
+      link: "https://www.youtube.com/@RakibSkyhear", 
+      status: "Go" 
+    },
+    { 
+      id: 3, 
+      title: "Facebook Page Follow", 
+      reward: 3000, 
+      link: "https://www.facebook.com/share/1AXpD1SECZ/", 
+      status: "Go" 
+    },
+    { 
+      id: 4, 
+      title: "TikTok Follow", 
+      reward: 3000, 
+      link: "https://tiktok.com/@rakib_vai...007", 
+      status: "Go" 
+    },
+  ]);
+
+  const [balance, setBalance] = useState(1519594);
+
+  const handleTaskClick = (id: number, link: string) => {
+    window.open(link, "_blank");
+    
+    setTasks(tasks.map(task => {
+      if (task.id === id && task.status === "Go") {
+        return { ...task, status: "Claim" };
+      }
+      return task;
+    }));
+  };
+
+  const handleClaim = (id: number, reward: number) => {
+    setBalance(balance + reward);
+    
+    setTasks(tasks.map(task => {
+      if (task.id === id) {
+        return { ...task, status: "Done" };
+      }
+      return task;
+    }));
+  };
+
   return (
-    <div className="py-10 bg-black p-4 pb-24">
-      <div className="flex justify-center items-center">
-        <img src="image/dollar.png" className="w-32 h-32" />
+    <div className="py-6 bg-black p-4 flex flex-col items-center min-h-screen text-white pb-20">
+      <div className="w-full max-w-md text-center mb-6">
+        <h1 className="text-3xl font-bold tracking-wide text-yellow-500">Earn Rewards</h1>
+        <p className="text-gray-400 text-sm mt-1">Complete tasks & get coins directly!</p>
+        
+        <div className="mt-4 bg-zinc-900 border border-zinc-800 p-3 rounded-xl flex justify-between items-center px-6">
+          <span className="text-gray-400 font-semibold">Total Balance:</span>
+          <span className="text-yellow-400 font-bold text-lg">🪙 {balance.toLocaleString()}</span>
+        </div>
       </div>
-      <p className="text-white text-3xl font-bold p-4">Earn More Money</p>
-      <p className="text-white text-xl font-bold p-4 text-left">Daily tasks</p>
-      <div className="py-3">
-        <EarnCard
-          title="Daily rewoard"
-          image="image/cdollar.png"
-          profit="234.3K"
-          flag={true}
-        />
-      </div>
-      <div className="flex flex-row justify-between items-center py-2">
-        <p className="text-left py-2 text-white text-xl font-semibold">
-          Tasks List
-        </p>
-      </div>
-      <div className="mt-3 space-y-2">
-        <EarnCard
-          title="Join our TG channel"
-          image="image/tg.png"
-          profit="234.3K"
-          flag={true}
-        />
-        <EarnCard
-          title="Get exclusive listing info"
-          image="image/youtube.png"
-          profit="5000"
-          flag={true}
-        />
-        <EarnCard
-          title="Join our TG channel"
-          image="image/tg.png"
-          profit="234.3K"
-          flag={true}
-        />
-        <EarnCard
-          title="Get exclusive listing info"
-          image="image/youtube.png"
-          profit="5000"
-          flag={true}
-        />
-        <EarnCard
-          title="Follow your X account"
-          image="image/twitter.png"
-          profit="234.3K"
-          flag={true}
-        />
-        <EarnCard
-          title="Choose"
-          image="image/hy.png"
-          profit="234.3K"
-          flag={true}
-        />
+
+      <div className="w-full max-w-md flex flex-col gap-3">
+        {tasks.map((task) => (
+          <div key={task.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-zinc-800 p-3 rounded-xl text-yellow-400 text-xl">
+                📢
+              </div>
+              <div className="text-left">
+                <h3 className="font-bold text-white text-sm">{task.title}</h3>
+                <p className="text-yellow-500 text-xs mt-1 font-semibold">+{task.reward.toLocaleString()} Coins</p>
+              </div>
+            </div>
+
+            <div>
+              {task.status === "Go" && (
+                <button 
+                  onClick={() => handleTaskClick(task.id, task.link)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-5 py-2 rounded-xl text-sm transition cursor-pointer"
+                >
+                  Go
+                </button>
+              )}
+              {task.status === "Claim" && (
+                <button 
+                  onClick={() => handleClaim(task.id, task.reward)}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition animate-pulse cursor-pointer"
+                >
+                  Claim
+                </button>
+              )}
+              {task.status === "Done" && (
+                <span className="text-green-500 font-bold text-lg px-3 py-1 bg-green-950/40 rounded-xl border border-green-800">
+                  ✔
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
-};
-export default Earn;
+}
