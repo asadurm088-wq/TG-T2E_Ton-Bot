@@ -5,36 +5,44 @@ export default function Earn() {
     {
       id: 1,
       title: "Join Telegram Channel",
-      instruction: "চ্যানেলে জয়েন করুন এবং আপডেট দেখুন",
+      firstInstruction: "টেলিগ্রাম চ্যানেলে প্রথমবার জয়েন করুন",
+      nextInstruction: "টেলিগ্রামের নতুন আপডেটগুলো দেখুন",
       reward: 0.50,
       link: "https://t.me/your_channel",
+      isCompletedFirstTime: false, // প্রথমবার জয়েন করার ট্র্যাক রাখার জন্য
       status: "Go", 
       availableAt: 0 
     },
     {
       id: 2,
-      title: "YouTube Video Task",
-      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
+      title: "YouTube Subscribe & Watch",
+      firstInstruction: "ইউটিউব চ্যানেল সাবস্ক্রাইব করুন",
+      nextInstruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
       reward: 0.30,
       link: "https://youtube.com",
+      isCompletedFirstTime: false,
       status: "Go",
       availableAt: 0 
     },
     {
       id: 3,
-      title: "Facebook Video Task",
-      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
+      title: "Facebook Page Follow",
+      firstInstruction: "ফেসবুক পেজ ফলো করুন",
+      nextInstruction: "ফেসবুক ভিডিও দেখুন ও লাইক দিন",
       reward: 0.30,
       link: "https://facebook.com",
+      isCompletedFirstTime: false,
       status: "Go",
       availableAt: 0 
     },
     {
       id: 4,
-      title: "TikTok Video Task",
-      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
+      title: "TikTok Follow",
+      firstInstruction: "টিকটক আইডি ফলো করুন",
+      nextInstruction: "টিকটক ভিডিও দেখুন ও লাইক দিন",
       reward: 0.30,
       link: "https://tiktok.com",
+      isCompletedFirstTime: false,
       status: "Go",
       availableAt: 0 
     }
@@ -71,12 +79,17 @@ export default function Earn() {
 
       setTasks(tasks.map(task => {
         if (task.id === id) {
-          return { ...task, status: "Waiting", availableAt: cooldownTime };
+          return { 
+            ...task, 
+            status: "Waiting", 
+            availableAt: cooldownTime,
+            isCompletedFirstTime: true // প্রথমবার সম্পন্ন হওয়ার পর এটি আর সাবস্ক্রাইব দেখাবে না, ভিডিও মোডে চলে যাবে
+          };
         }
         return task;
       }));
       
-      alert("সফলভাবে রিওয়ার্ড ক্লেইম করা হয়েছে! ১৮ ঘণ্টা পর আবার ভিডিও দেখে ক্লেইম করতে পারবেন।");
+      alert("সফলভাবে রিওয়ার্ড ক্লেইম করা হয়েছে! ১৮ ঘণ্টা পর নতুন ভিডিও ও আপডেট দেখতে পারবেন।");
     }
   };
 
@@ -85,7 +98,7 @@ export default function Earn() {
       
       <div className="w-full max-w-md text-center mb-6">
         <h1 className="text-2xl font-bold text-emerald-400">Earn USDT</h1>
-        <p className="text-gray-400 text-xs mt-1">ভিডিও দেখুন, লাইক দিন এবং টাস্ক কমপ্লিট করুন!</p>
+        <p className="text-gray-400 text-xs mt-1">প্রথমবার জয়েন করুন, পরবর্তীতে ভিডিও দেখে আয় করুন!</p>
       </div>
 
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 p-4 rounded-2xl mb-6 text-center shadow-lg">
@@ -109,6 +122,9 @@ export default function Earn() {
           if (task.status === "Verify") buttonText = "Verify";
           if (task.status === "Claim") buttonText = "Claim";
 
+          // ইউজার প্রথমবার কাজ শেষ করেছে কি না তার ওপর ভিত্তি করে লেখা পরিবর্তন হবে
+          const currentInstruction = task.isCompletedFirstTime ? task.nextInstruction : task.firstInstruction;
+
           return (
             <div key={task.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -117,7 +133,10 @@ export default function Earn() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-bold text-white text-xs">{task.title}</h3>
-                  <p className="text-yellow-400/90 text-[10px] mt-0.5 font-medium">📺 {task.instruction}</p>
+                  {/* প্রথমবার সাবস্ক্রাইব/জয়েন এবং পরবর্তীতে ভিডিও দেখার নির্দেশনা */}
+                  <p className="text-yellow-400/90 text-[10px] mt-0.5 font-medium">
+                    {task.isCompletedFirstTime ? "📺 " : "📌 "} {currentInstruction}
+                  </p>
                   <p className="text-emerald-400 text-xs mt-1 font-semibold">+{task.reward.toFixed(2)} USDT</p>
                 </div>
               </div>
