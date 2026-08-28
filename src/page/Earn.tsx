@@ -1,52 +1,62 @@
 import { useState, useEffect } from "react";
 
 export default function Earn() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Join Telegram Channel",
-      firstInstruction: "টেলিগ্রাম চ্যানেলে প্রথমবার জয়েন করুন",
-      nextInstruction: "টেলিগ্রামের নতুন আপডেটগুলো দেখুন",
-      reward: 0.50,
-      link: "https://t.me/your_channel",
-      isCompletedFirstTime: false, // প্রথমবার জয়েন করার ট্র্যাক রাখার জন্য
-      status: "Go", 
-      availableAt: 0 
-    },
-    {
-      id: 2,
-      title: "YouTube Subscribe & Watch",
-      firstInstruction: "ইউটিউব চ্যানেল সাবস্ক্রাইব করুন",
-      nextInstruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
-      reward: 0.30,
-      link: "https://youtube.com",
-      isCompletedFirstTime: false,
-      status: "Go",
-      availableAt: 0 
-    },
-    {
-      id: 3,
-      title: "Facebook Page Follow",
-      firstInstruction: "ফেসবুক পেজ ফলো করুন",
-      nextInstruction: "ফেসবুক ভিডিও দেখুন ও লাইক দিন",
-      reward: 0.30,
-      link: "https://facebook.com",
-      isCompletedFirstTime: false,
-      status: "Go",
-      availableAt: 0 
-    },
-    {
-      id: 4,
-      title: "TikTok Follow",
-      firstInstruction: "টিকটক আইডি ফলো করুন",
-      nextInstruction: "টিকটক ভিডিও দেখুন ও লাইক দিন",
-      reward: 0.30,
-      link: "https://tiktok.com",
-      isCompletedFirstTime: false,
-      status: "Go",
-      availableAt: 0 
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("earn_tasks_data");
+    if (savedTasks) {
+      try {
+        return JSON.parse(savedTasks);
+      } catch (e) {
+        console.error(e);
+      }
     }
-  ]);
+    return [
+      {
+        id: 1,
+        title: "Join Telegram Channel",
+        firstInstruction: "টেলিগ্রাম চ্যানেলে প্রথমবার জয়েন করুন",
+        nextInstruction: "টেলিগ্রামের নতুন আপডেটগুলো দেখুন",
+        reward: 0.50,
+        link: "https://t.me/RakibEarningZoneBD", // আপনার টেলিগ্রাম লিংক
+        isCompletedFirstTime: false,
+        status: "Go", 
+        availableAt: 0 
+      },
+      {
+        id: 2,
+        title: "YouTube Subscribe & Watch",
+        firstInstruction: "ইউটিউব চ্যানেল সাবস্ক্রাইব করুন",
+        nextInstruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
+        reward: 0.30,
+        link: "https://www.youtube.com/@RakibSkyhear", // আপনার ইউটিউব লিংক
+        isCompletedFirstTime: false,
+        status: "Go",
+        availableAt: 0 
+      },
+      {
+        id: 3,
+        title: "Facebook Page Follow",
+        firstInstruction: "ফেসবুক পেজ ফলো করুন",
+        nextInstruction: "ফেসবুক ভিডিও দেখুন ও লাইক দিন",
+        reward: 0.30,
+        link: "https://www.facebook.com/share/18v7qwvFVx/", // আপনার ফেসবুক লিংক
+        isCompletedFirstTime: false,
+        status: "Go",
+        availableAt: 0 
+      },
+      {
+        id: 4,
+        title: "TikTok Follow",
+        firstInstruction: "টিকটক আইডি ফলো করুন",
+        nextInstruction: "টিকটক ভিডিও দেখুন ও লাইক দিন",
+        reward: 0.30,
+        link: "https://www.tiktok.com/@rakib_vai...007", // আপনার টিকটক লিংক
+        isCompletedFirstTime: false,
+        status: "Go",
+        availableAt: 0 
+      }
+    ];
+  });
 
   const [, setTime] = useState(Date.now());
   useEffect(() => {
@@ -54,11 +64,15 @@ export default function Earn() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("earn_tasks_data", JSON.stringify(tasks));
+  }, [tasks]);
+
   const handleTaskAction = (id: number, link: string, currentStatus: string) => {
     if (currentStatus === "Go") {
       window.open(link, "_blank");
       
-      setTasks(tasks.map(task => {
+      setTasks(tasks.map((task: any) => {
         if (task.id === id) {
           return { ...task, status: "Verify" };
         }
@@ -66,7 +80,7 @@ export default function Earn() {
       }));
     } 
     else if (currentStatus === "Verify") {
-      setTasks(tasks.map(task => {
+      setTasks(tasks.map((task: any) => {
         if (task.id === id) {
           return { ...task, status: "Claim" };
         }
@@ -77,13 +91,13 @@ export default function Earn() {
     else if (currentStatus === "Claim") {
       const cooldownTime = Date.now() + (18 * 60 * 60 * 1000); // ১৮ ঘণ্টার টাইমার
 
-      setTasks(tasks.map(task => {
+      setTasks(tasks.map((task: any) => {
         if (task.id === id) {
           return { 
             ...task, 
             status: "Waiting", 
             availableAt: cooldownTime,
-            isCompletedFirstTime: true // প্রথমবার সম্পন্ন হওয়ার পর এটি আর সাবস্ক্রাইব দেখাবে না, ভিডিও মোডে চলে যাবে
+            isCompletedFirstTime: true 
           };
         }
         return task;
@@ -107,7 +121,7 @@ export default function Earn() {
       </div>
 
       <div className="w-full max-w-md flex flex-col gap-3">
-        {tasks.map((task) => {
+        {tasks.map((task: any) => {
           const isWaiting = task.status === "Waiting" && Date.now() < task.availableAt;
 
           if (task.status === "Waiting" && Date.now() >= task.availableAt) {
@@ -122,7 +136,6 @@ export default function Earn() {
           if (task.status === "Verify") buttonText = "Verify";
           if (task.status === "Claim") buttonText = "Claim";
 
-          // ইউজার প্রথমবার কাজ শেষ করেছে কি না তার ওপর ভিত্তি করে লেখা পরিবর্তন হবে
           const currentInstruction = task.isCompletedFirstTime ? task.nextInstruction : task.firstInstruction;
 
           return (
@@ -133,7 +146,6 @@ export default function Earn() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-bold text-white text-xs">{task.title}</h3>
-                  {/* প্রথমবার সাবস্ক্রাইব/জয়েন এবং পরবর্তীতে ভিডিও দেখার নির্দেশনা */}
                   <p className="text-yellow-400/90 text-[10px] mt-0.5 font-medium">
                     {task.isCompletedFirstTime ? "📺 " : "📌 "} {currentInstruction}
                   </p>
