@@ -1,4 +1,3 @@
-
 interface InviteCardProps {
   title: string;
   profit: string;
@@ -9,7 +8,7 @@ const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
     const tg = (window as any).Telegram?.WebApp;
     const userId = tg?.initDataUnsafe?.user?.id || '';
     
-    // আপনার টেলিগ্রাম বটের ইউজারনেম এখানে দেওয়া আছে
+    // টেলিগ্রাম বটের ইউজারনেম
     const botUrl = `https://t.me/IncomingCashOfficial_bot?start=${userId}`;
     const text = encodeURIComponent("Join this awesome app and get bonuses!");
     const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${text}`;
@@ -34,4 +33,5 @@ const InviteCard: React.FC<InviteCardProps> = ({ title, profit }) => {
 };
 
 export default InviteCard;
+
 
