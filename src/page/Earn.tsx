@@ -5,6 +5,7 @@ export default function Earn() {
     {
       id: 1,
       title: "Join Telegram Channel",
+      instruction: "চ্যানেলে জয়েন করুন এবং আপডেট দেখুন",
       reward: 0.50,
       link: "https://t.me/your_channel",
       status: "Go", 
@@ -12,7 +13,8 @@ export default function Earn() {
     },
     {
       id: 2,
-      title: "YouTube Subscribe & Watch",
+      title: "YouTube Video Task",
+      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
       reward: 0.30,
       link: "https://youtube.com",
       status: "Go",
@@ -20,7 +22,8 @@ export default function Earn() {
     },
     {
       id: 3,
-      title: "Facebook Page Follow",
+      title: "Facebook Video Task",
+      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
       reward: 0.30,
       link: "https://facebook.com",
       status: "Go",
@@ -28,7 +31,8 @@ export default function Earn() {
     },
     {
       id: 4,
-      title: "TikTok Follow",
+      title: "TikTok Video Task",
+      instruction: "ভিডিও দেখুন, লাইক দিন এবং কমেন্ট করুন",
       reward: 0.30,
       link: "https://tiktok.com",
       status: "Go",
@@ -48,13 +52,22 @@ export default function Earn() {
       
       setTasks(tasks.map(task => {
         if (task.id === id) {
+          return { ...task, status: "Verify" };
+        }
+        return task;
+      }));
+    } 
+    else if (currentStatus === "Verify") {
+      setTasks(tasks.map(task => {
+        if (task.id === id) {
           return { ...task, status: "Claim" };
         }
         return task;
       }));
-    } else if (currentStatus === "Claim") {
-      // ১৮ ঘণ্টার কুলডাউন টাইম (১৮ ঘণ্টা = 18 * 3600 * 1000 মিলিসেকেন্ড)
-      const cooldownTime = Date.now() + (18 * 60 * 60 * 1000);
+      alert("কাজ ভেরিফাই হয়েছে! এখন রিওয়ার্ড ক্লেইম করুন।");
+    } 
+    else if (currentStatus === "Claim") {
+      const cooldownTime = Date.now() + (18 * 60 * 60 * 1000); // ১৮ ঘণ্টার টাইমার
 
       setTasks(tasks.map(task => {
         if (task.id === id) {
@@ -63,7 +76,7 @@ export default function Earn() {
         return task;
       }));
       
-      alert("সফলভাবে রিওয়ার্ড ক্লেইম করা হয়েছে! ১৮ ঘণ্টা পর আবার এই টাস্কটি করতে পারবেন।");
+      alert("সফলভাবে রিওয়ার্ড ক্লেইম করা হয়েছে! ১৮ ঘণ্টা পর আবার ভিডিও দেখে ক্লেইম করতে পারবেন।");
     }
   };
 
@@ -72,7 +85,7 @@ export default function Earn() {
       
       <div className="w-full max-w-md text-center mb-6">
         <h1 className="text-2xl font-bold text-emerald-400">Earn USDT</h1>
-        <p className="text-gray-400 text-xs mt-1">Complete tasks & get USDT directly!</p>
+        <p className="text-gray-400 text-xs mt-1">ভিডিও দেখুন, লাইক দিন এবং টাস্ক কমপ্লিট করুন!</p>
       </div>
 
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 p-4 rounded-2xl mb-6 text-center shadow-lg">
@@ -92,6 +105,10 @@ export default function Earn() {
           const hours = Math.floor(timeLeft / 3600);
           const minutes = Math.floor((timeLeft % 3600) / 60);
 
+          let buttonText = "Go";
+          if (task.status === "Verify") buttonText = "Verify";
+          if (task.status === "Claim") buttonText = "Claim";
+
           return (
             <div key={task.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -100,21 +117,22 @@ export default function Earn() {
                 </div>
                 <div className="text-left">
                   <h3 className="font-bold text-white text-xs">{task.title}</h3>
-                  <p className="text-emerald-400 text-xs mt-0.5 font-semibold">+{task.reward.toFixed(2)} USDT</p>
+                  <p className="text-yellow-400/90 text-[10px] mt-0.5 font-medium">📺 {task.instruction}</p>
+                  <p className="text-emerald-400 text-xs mt-1 font-semibold">+{task.reward.toFixed(2)} USDT</p>
                 </div>
               </div>
 
               <div>
                 {isWaiting ? (
                   <span className="text-yellow-400 font-bold text-[11px] px-3 py-2 bg-yellow-950/40 rounded-xl border border-yellow-800/60 block text-center">
-                    ⏳ {hours} ঘণ্টা {minutes}মি পর
+                    ⏳ {hours}ঘণ্টা {minutes}মি পর
                   </span>
                 ) : (
                   <button 
                     onClick={() => handleTaskAction(task.id, task.link, task.status)}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-5 py-2 rounded-xl text-xs transition cursor-pointer"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer"
                   >
-                    {task.status === "Go" ? "Go" : "Claim"}
+                    {buttonText}
                   </button>
                 )}
               </div>
