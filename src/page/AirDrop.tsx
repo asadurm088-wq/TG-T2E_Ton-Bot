@@ -13,15 +13,16 @@ const Airdrop = () => {
         </p>
 
         {/* উইথড্র ক্যাশ বাটন */}
-        <button 
-          onClick={() => window.location.href = '/withdraw'} 
+        <a 
+          href="/withdraw"
           style={{
+            display: 'inline-block',
             marginTop: '20px',
             marginBottom: '30px',
             padding: '14px 28px',
             backgroundColor: '#3b82f6',
             color: '#fff',
-            border: 'none',
+            textDecoration: 'none',
             borderRadius: '12px',
             fontSize: '18px',
             fontWeight: 'bold',
@@ -30,7 +31,7 @@ const Airdrop = () => {
           }}
         >
           Withdraw Cash
-        </button>
+        </a>
       </div>
 
       <div className="mt-6 w-full max-w-md">
@@ -59,4 +60,5 @@ const Airdrop = () => {
 };
 
 export default Airdrop;
+
 
