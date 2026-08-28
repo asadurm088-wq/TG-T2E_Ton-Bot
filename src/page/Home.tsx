@@ -1,158 +1,75 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import AnaylsisCard from "../component/section/AnalysisCard";
-import ProgressBar from "../component/ProgressBar";
-import { useSelector } from "../store";
-function Home() {
-  const tokenState = useSelector((state) => state.wallet.user?.balance);
-  const [imgStatus, setImgStatus] = useState(false);
-  const [token, setToken] = useState<number>(tokenState);
-  const [remainedEnergy, setRemainedEnergy] = useState<number>(1000);
-  function formatNumberWithCommas(number: number, locale = "en-US") {
-    return new Intl.NumberFormat(locale).format(number);
-  }
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const [score, setScore] = useState<string>("+1");
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.random() * (event.clientX - rect.left);
-    const y = Math.random() * (event.clientY - rect.top);
 
-    const styleElement = document.createElement("style");
-    document.head.appendChild(styleElement);
-
-    styleElement.sheet &&
-      styleElement.sheet.insertRule(
-        "@keyframes fade-out-top-right {0% {opacity: 1; transform: translateY(0); } 100% {opacity: 0;transform: translateY(-100%);}}",
-        0
-      );
-
-    const newDiv = document.createElement("div");
-    newDiv.textContent = `${score}`;
-    // newDiv.style.backgroundImage = "url('image/dollar.png')";
-    newDiv.style.backgroundRepeat = "no-repeat";
-    newDiv.style.backgroundPosition = "center";
-    newDiv.style.fontSize = "30px";
-    newDiv.style.paddingLeft = "30px";
-    newDiv.style.display = "flex";
-    newDiv.style.justifyContent = "center";
-    newDiv.style.alignItems = "center";
-    newDiv.style.backgroundSize = "cover";
-    newDiv.style.width = "40px";
-    newDiv.style.height = "140px";
-    newDiv.style.position = "absolute";
-    newDiv.style.left = `${x + 50}px`;
-    newDiv.style.top = `${y}px`;
-    newDiv.style.color = score == "+1" ? "#58E1E2" : "red";
-    newDiv.className =
-      "dynamic-div animate-fadeouttopright transform max-sm:text-3xl text-5xl font-bold transition not-selectable";
-
-    bodyRef.current && bodyRef.current.appendChild(newDiv);
-    const interval = setTimeout(() => newDiv && newDiv.remove(), 1000);
-
-    return () => clearTimeout(interval);
-  };
+export default function Home() {
+  const [balance, setBalance] = useState(() => {
+    const saved = localStorage.getItem("balance") || localStorage.getItem("user_balance");
+    return saved ? parseInt(saved, 10) : 1519594;
+  });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRemainedEnergy((pre) =>
-        pre == 999 ? 1000 : pre < 1000 ? pre + 1 : 1000
-      );
-    }, 21600);
-    return () => clearInterval(interval);
+    const handleStorageChange = () => {
+      const updated = localStorage.getItem("balance") || localStorage.getItem("user_balance");
+      if (updated) {
+        setBalance(parseInt(updated, 10));
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const handleTap = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (remainedEnergy > 0) {
-      if (remainedEnergy < 500) {
-        setScore("+2");
-        setToken(token + 2);
-      } else {
-        setScore("+1");
-        setToken(token + 1);
-      }
-      setRemainedEnergy(remainedEnergy - 1);
-      handleClick(event);
-    }
-  };
-
-  const handleMouseDown = () => {
-    setImgStatus(true);
-  };
-  const handleMouseLeave = () => {
-    setImgStatus(false);
-  };
-  console.log("imgStatus", imgStatus);
-
   return (
-    <div className="pb-24 px-4">
-      <ToastContainer />
-      <AnaylsisCard />
-      <div
-        id="mainWindow"
-        className="relative mt-2 flex flex-col items-center justify-center w-full"
-      >
-        <div className="flex flex-col justify-center items-center mb-7 gap-2 w-full">
-          <div className="flex flex-row justify-center items-center mt-4">
-            <img
-              src="/image/dollar.png"
-              alt=""
-              className="w-14 h-14 mt-1 max-sm:w-10 max-sm:h-10"
-            />
-            <h1 className="text-5xl text-white ml-3 font-bold max-sm:text-3xl">
-              {formatNumberWithCommas(token)}
-            </h1>
-          </div>
-          <div className="w-full">
-            <ProgressBar value={remainedEnergy / 10} />
-          </div>
+    <div className="py-6 bg-black p-4 flex flex-col items-center min-h-screen text-white pb-24">
+      
+      {/* টপ হেডার / ওয়ালেট স্ট্যাটাস */}
+      <div className="w-full max-w-md flex justify-between items-center mb-6 px-2">
+        <div>
+          <h1 className="text-xl font-bold text-white">My Wallet</h1>
+          <p className="text-xs text-gray-400">TON & USDT Network</p>
         </div>
-        <div className="w-full sm:p-4 md:-6 lg:p-8">
-          <div
-            className={`relative bg-[url('/image/mikeToken.png')] rounded-full bg-cover w-full aspect-square z-10 ${
-              remainedEnergy > 0
-                ? "cursor-pointer"
-                : "cursor-not-allowed opacity-50"
-            } ${imgStatus ? " border-[5px]" : "border-0"}`}
-            ref={bodyRef}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseLeave}
-            onClick={handleTap}
-          />
-        </div>
-        <div className="flex flex-row justify-between w-full px-10 max-sm:px-4 mt-4">
-          <div className="flex justify-between w-full">
-            <h3 className="text-2xl mb-2 text-white flex flex-row">
-              <span className="flex text-3xl items-center ">
-                <img
-                  src="/image/icon/lightning.svg"
-                  alt="lightning"
-                  className="w-6 h-6 inline mt-1"
-                />
-              </span>
-              <span className="text-2xl text-white max-sm:text-lg">
-                {remainedEnergy}/1000
-              </span>
-            </h3>
-            <div className="flex justify-center items-center">
-              <Link to="/boost" className="flex">
-                <img
-                  src="/image/rocket.png"
-                  alt="rocket"
-                  className="w-8 h-8 inline max-sm:w-6 max-sm:h-6"
-                />
-                <h3 className="text-2xl max-sm:text-lg text-white">Boost</h3>
-              </Link>
-            </div>
-          </div>
+        <div className="bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Connected
         </div>
       </div>
+
+      {/* বাইনান্স/বাইবিট স্টাইল মেইন USDT ব্যালেন্স কার্ড */}
+      <div className="w-full max-w-md bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800 p-6 rounded-3xl shadow-2xl flex flex-col items-center my-2">
+        
+        <div className="flex items-center gap-2 mb-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full">
+          <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-black font-bold text-xs shadow">
+            ₮
+          </div>
+          <span className="text-sm font-bold tracking-wider text-white">USDT Balance</span>
+        </div>
+
+        {/* প্রিমিয়াম ছোট অ্যামাউন্ট ব্যালেন্স */}
+        <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 my-2">
+          {(balance * 0.0001).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-bold text-emerald-400">USDT</span>
+        </div>
+
+        <div className="text-xs text-gray-400 font-medium bg-black/40 px-3 py-1 rounded-md border border-zinc-800/80 mt-1">
+          ≈ ${(balance * 0.0001).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+        </div>
+
+        {/* কুইক অ্যাকশন বাটন */}
+        <div className="grid grid-cols-2 gap-3 w-full mt-6">
+          <Link to="/earn" className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-2.5 rounded-xl text-center text-sm transition">
+            Earn More
+          </Link>
+          <Link to="/withdraw" className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-xl text-center text-sm transition border border-zinc-700">
+            Withdraw
+          </Link>
+        </div>
+
+      </div>
+
+      {/* কুইক নোটিশ বা ব্যানার সেকশন */}
+      <div className="w-full max-w-md bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl mt-4">
+        <h3 className="text-sm font-bold text-yellow-500 mb-1">📢 Announcement</h3>
+        <p className="text-xs text-gray-400">Complete tasks from the Earn tab to get instant USDT rewards directly in your balance.</p>
+      </div>
+
     </div>
   );
 }
-
-export default Home;
