@@ -52,12 +52,12 @@ export default function Home() {
           ≈ ${(balance * 0.0001).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
         </div>
 
-        {/* কুইক অ্যাকশন বাটন */}
+        {/* কুইক অ্যাকশন বাটন (সঠিক পেজ রাউট সহ) */}
         <div className="grid grid-cols-2 gap-3 w-full mt-6">
           <Link to="/earn" className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-2.5 rounded-xl text-center text-sm transition">
             Earn More
           </Link>
-          <Link to="/withdraw" className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-xl text-center text-sm transition border border-zinc-700">
+          <Link to="/airdrop" className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-xl text-center text-sm transition border border-zinc-700">
             Withdraw
           </Link>
         </div>
