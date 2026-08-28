@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Earn() {
   const [tasks, setTasks] = useState([
@@ -32,7 +32,16 @@ export default function Earn() {
     },
   ]);
 
-  const [balance, setBalance] = useState(1519594);
+  // ব্রাউজারের লকাল স্টোরেজ থেকে মেইন ব্যালেন্স লোড করা
+  const [balance, setBalance] = useState(() => {
+    const savedBalance = localStorage.getItem("user_balance");
+    return savedBalance ? parseInt(savedBalance, 10) : 1519594;
+  });
+
+  // ব্যালেন্স পরিবর্তন হলে সেটি লকাল স্টোরেজে সেভ করে রাখা যাতে অন্য পেজেও পাওয়া যায়
+  useEffect(() => {
+    localStorage.setItem("user_balance", balance.toString());
+  }, [balance]);
 
   const handleTaskClick = (id: number, link: string) => {
     window.open(link, "_blank");
@@ -46,7 +55,8 @@ export default function Earn() {
   };
 
   const handleClaim = (id: number, reward: number) => {
-    setBalance(balance + reward);
+    const newBalance = balance + reward;
+    setBalance(newBalance);
     
     setTasks(tasks.map(task => {
       if (task.id === id) {
