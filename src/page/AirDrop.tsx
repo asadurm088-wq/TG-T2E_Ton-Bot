@@ -1,5 +1,3 @@
-import CheckCom from "../component/Ch";
-
 export default function Airdrop() {
   return (
     <div className="py-10 bg-black p-4 flex flex-col items-center min-h-screen text-center">
@@ -36,22 +34,22 @@ export default function Airdrop() {
 
       <div className="mt-6 w-full max-w-md">
         <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <CheckCom flag={true} />
+          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
           <p className="text-white ml-3 text-left">Exchange negotiations</p>
         </div>
         
         <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <CheckCom flag={true} />
+          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
           <p className="text-white ml-3 text-left">Market Maker negotiations</p>
         </div>
 
         <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <CheckCom flag={true} />
+          <span style={{ color: "#22c55e", fontSize: "20px", marginRight: "10px" }}>✔</span>
           <p className="text-white ml-3 text-left">Key partnerships are coming</p>
         </div>
 
         <div className="flex items-center my-3 bg-zinc-900 p-3 rounded-lg">
-          <CheckCom flag={false} />
+          <span style={{ color: "#ef4444", fontSize: "20px", marginRight: "10px" }}>✖</span>
           <p className="text-white ml-3 text-left">Airdrop task list</p>
         </div>
       </div>
