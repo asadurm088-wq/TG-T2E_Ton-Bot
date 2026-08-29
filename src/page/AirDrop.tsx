@@ -5,9 +5,9 @@ export default function Airdrop() {
   const [activeTab, setActiveTab] = useState("Airdrop");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   
-  // LocalStorage থেকে ব্যালেন্স লোড করা
+  // হোমপেজের সাথে সিঙ্ক রাখার জন্য কমন কি (shared_app_balance) ব্যবহার করা হলো
   const [balance, setBalance] = useState<number>(() => {
-    const savedBalance = localStorage.getItem("airdrop_user_balance");
+    const savedBalance = localStorage.getItem("shared_app_balance");
     return savedBalance !== null ? parseFloat(savedBalance) : 139.76;
   });
   
@@ -16,8 +16,19 @@ export default function Airdrop() {
   const [accountDetails, setAccountDetails] = useState("");
   const navigate = useNavigate();
 
+  // অন্য কোনো পেজ থেকে ব্যালেন্স পরিবর্তন হলে তা সাথে সাথে সিঙ্ক করার জন্য
   useEffect(() => {
-    localStorage.setItem("airdrop_user_balance", balance.toString());
+    const handleStorageChange = () => {
+      const updatedBalance = localStorage.getItem("shared_app_balance");
+      if (updatedBalance !== null) setBalance(parseFloat(updatedBalance));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("shared_app_balance", balance.toString());
   }, [balance]);
 
   // সিক্রেট অ্যাডমিন প্যানেল খোলার ফাংশন (ডাবল ক্লিক)
@@ -27,7 +38,7 @@ export default function Airdrop() {
     }
   };
 
-  // ইনস্ট্যান্ট উইথড্র ও ব্যালেন্স কাটার লজিক
+  // ইনস্ট্যান্ট উইথড্র ও অ্যাডমিন প্যানেলে রিকোয়েস্ট পাঠানোর লজিক
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
     const withdrawAmount = parseFloat(amount);
@@ -56,7 +67,21 @@ export default function Airdrop() {
     const finalBalance = Number(updatedBalance.toFixed(2));
     
     setBalance(finalBalance);
-    localStorage.setItem("airdrop_user_balance", finalBalance.toString());
+    localStorage.setItem("shared_app_balance", finalBalance.toString());
+
+    // উইথড্র কাউন্ট আপডেট করা
+    const currentCount = parseInt(localStorage.getItem("shared_withdraw_count") || "0", 10);
+    const newCount = currentCount + 1;
+    localStorage.setItem("shared_withdraw_count", newCount.toString());
+
+    // অ্যাডমিন প্যানেলের জন্য রিকোয়েস্ট সেভ করা
+    const existingRequests = JSON.parse(localStorage.getItem("withdraw_requests") || "[]");
+    const newRequest = {
+      user: accountDetails,
+      amount: `${withdrawAmount} USDT (${selectedPaymentMethod})`,
+      status: "Pending"
+    };
+    localStorage.setItem("withdraw_requests", JSON.stringify([newRequest, ...existingRequests]));
 
     alert(`✅ সফলভাবে উইথড্র রিকোয়েস্ট গ্রহণ করা হয়েছে!\n\n💳 মেথড: ${selectedPaymentMethod}\n📌 অ্যাকাউন্ট/অ্যাড্রেস: ${accountDetails}\n💸 উইথড্র: ${withdrawAmount} USDT\n💰 অবশিষ্ট ব্যালেন্স: ${finalBalance} USDT`);
     
@@ -94,7 +119,7 @@ export default function Airdrop() {
       {/* স্ক্রিন কনটেন্ট */}
       <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
         
-        {/* আপনার দেওয়া নতুন ডিজাইন করা স্টাইলিশ হেডার ব্যানার ("Incoming Cash") */}
+        {/* ইনকামিং ক্যাশ ব্যানার */}
         <div className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg mb-2">
           <div className="bg-[#0f141f] rounded-2xl py-3 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
@@ -258,7 +283,10 @@ export default function Airdrop() {
       {/* বটম নেভিগেশন বার */}
       <div className="grid grid-cols-5 items-center bg-[#0c1017] py-2 px-2 border-t border-gray-800 w-full shrink-0 shadow-2xl">
         <div 
-          onClick={() => setActiveTab("Exchange")}
+          onClick={() => {
+            setActiveTab("Exchange");
+            navigate("/"); // হোম পেজে যাওয়ার জন্য
+          }}
           className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Exchange" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
         >
           <span className="text-base mb-0.5 font-black">🟡</span>
