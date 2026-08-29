@@ -3,17 +3,31 @@ import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Exchange");
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
   const navigate = useNavigate();
 
-  // Announcement বক্সের নিচে ডাবল ক্লিক করলে সিক্রেট অ্যাডমিন পেজে যাবে
+  // অ্যানাউন্সমেন্ট বক্সের নিচে ডাবল ক্লিক করলে সিক্রেট অ্যাডমিন পেজে যাবে
   const handleSecretAdminOpen = (e: React.MouseEvent) => {
     if (e.detail === 2) {
       navigate("/admin");
     }
   };
 
+  // উইথড্র সাবমিট করার ফাংশন
+  const handleWithdrawSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!withdrawAmount) {
+      alert("দ कृपया পরিমাণ লিখুন");
+      return;
+    }
+    alert(`সফলভাবে ${withdrawAmount} USDT উইথড্র রিকোয়েস্ট সাবমিট হয়েছে!`);
+    setShowWithdrawModal(false);
+    setWithdrawAmount("");
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white justify-between select-none font-sans">
+    <div className="flex flex-col min-h-screen bg-black text-white justify-between select-none font-sans relative">
       {/* মেইন কনটেন্ট এরিয়া */}
       <div className="flex flex-col flex-1 p-4 max-w-md mx-auto w-full justify-between">
         
@@ -43,12 +57,18 @@ export default function Home() {
               </div>
               <div className="text-xs text-gray-400 mb-5">≈ $154.76 USD</div>
 
-              {/* Earn More এবং Withdraw বাটন */}
+              {/* Earn More এবং কাজ করা Withdraw বাটন */}
               <div className="grid grid-cols-2 gap-3">
-                <button className="bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition shadow-md">
+                <button 
+                  onClick={() => setActiveTab("Earn")}
+                  className="bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition shadow-md cursor-pointer"
+                >
                   Earn More
                 </button>
-                <button className="bg-[#1c222b] hover:bg-[#252b36] text-white font-bold py-3 rounded-xl text-sm border border-gray-800 transition shadow-md">
+                <button 
+                  onClick={() => setShowWithdrawModal(true)}
+                  className="bg-[#1c222b] hover:bg-[#252b36] text-white font-bold py-3 rounded-xl text-sm border border-gray-800 transition shadow-md cursor-pointer"
+                >
                   Withdraw
                 </button>
               </div>
@@ -64,7 +84,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* অ্যানাউন্সমেন্ট বক্সের নিচের সেই সিক্রেট হিডেন এরিয়া (এখানে ডাবল ক্লিক করলে অ্যাডমিন প্যানেল খুলবে) */}
+            {/* অ্যানাউন্সমেন্ট বক্সের নিচের সিক্রেট হিডেন এরিয়া (ডাবল ক্লিক করলে অ্যাডমিন প্যানেল খুলবে) */}
             <div 
               onClick={handleSecretAdminOpen}
               className="w-full h-16 mt-4 cursor-default flex items-center justify-center text-transparent text-[1px]"
@@ -81,7 +101,43 @@ export default function Home() {
 
       </div>
 
-      {/* একদম নিচের নেভিগেশন বার (স্ক্রিনশটের হুবহু ডিজাইন অনুযায়ী) */}
+      {/* উইথড্র পপআপ মডাল (Withdraw বাটনে ক্লিক করলে এটি ওপেন হবে) */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#161b22] border border-gray-800 rounded-2xl p-6 w-full max-w-sm text-white shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Withdraw USDT</h3>
+              <button 
+                onClick={() => setShowWithdrawModal(false)}
+                className="text-gray-400 hover:text-white text-lg font-bold px-2"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleWithdrawSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">পরিমাণ (USDT)</label>
+                <input 
+                  type="number"
+                  placeholder="কত USDT উইথড্র করবেন?"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  className="w-full bg-[#0d1117] border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500"
+                />
+              </div>
+              <button 
+                type="submit"
+                className="w-full bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition shadow-md"
+              >
+                Confirm Withdraw
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* একদম নিচের নেভিগেশন বার */}
       <div className="grid grid-cols-5 items-center bg-[#14181f] py-3 px-2 border-t border-gray-800/60 w-full max-w-md mx-auto rounded-t-2xl">
         <div 
           onClick={() => setActiveTab("Exchange")}
