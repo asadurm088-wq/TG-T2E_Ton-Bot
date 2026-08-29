@@ -15,6 +15,7 @@ import Mine from "./page/Mine";
 import Friends from "./page/Friends";
 import Earn from "./page/Earn";
 import Airdrop from "./page/AirDrop";
+import { Admin } from "./page/Admin";
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,10 @@ function App() {
         <div className="App flex flex-col justify-between w-[700px] max-sm:w-[750px] bg-[#1B1F24]">
           <ReduxProvider store={store}>
             <Routes>
+              {/* অ্যাডমিন প্যানেলের জন্য আলাদা রাউট */}
+              <Route path="/admin" element={<Admin />} />
+
+              {/* মূল গেমের রাউটগুলো */}
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="ranking" element={<Ranking />} />
