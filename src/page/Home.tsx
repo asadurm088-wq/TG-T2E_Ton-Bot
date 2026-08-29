@@ -5,44 +5,61 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("Exchange");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [amount, setAmount] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("বিকাশ (bKash)");
   const navigate = useNavigate();
 
-  // সিক্রেট অ্যাডমিন প্যানেল খোলার জন্য (অ্যানাউন্সমেন্ট বক্সের নিচে ডাবল ক্লিক)
+  // অ্যানাউন্সমেন্ট বক্সের নিচে ডাবল ক্লিক করলে সিক্রেট অ্যাডমিন প্যানেল খোলার ব্যবস্থা
   const handleSecretClick = (e: React.MouseEvent) => {
     if (e.detail === 2) {
       navigate("/admin");
     }
   };
 
+  // উইথড্র সাবমিট করার ফাংশন
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount) {
-      alert("দয়া করে পরিমাণ লিখুন");
+      alert("দয়া করে টাকার পরিমাণ লিখুন");
       return;
     }
-    alert(`সফলভাবে ${amount} USDT উইথড্র রিকোয়েস্ট সাবমিট হয়েছে!`);
+    alert(`সফলভাবে উইথড্র রিকোয়েস্ট সাবমিট হয়েছে!\nমেথড: ${selectedPaymentMethod}\nপরিমাণ: ${amount}`);
     setShowWithdrawModal(false);
     setAmount("");
   };
 
+  // আপনার দেওয়া ১০টি পেমেন্ট মেথড
+  const paymentMethods = [
+    "বিকাশ (bKash)",
+    "নগদ (Nagad)",
+    "রকেট (Rocket)",
+    "উপায় (Upay)",
+    "USDT (TRC20 / TON)",
+    "Binance Pay",
+    "পেয়ার (Payeer)",
+    "পারফেক্ট মানি (Perfect Money)",
+    "বটকয়েন (Bitcoin / BTC)",
+    "ব্যাংক ট্রান্সফার (Bank Transfer)",
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-black text-white justify-between select-none">
-      {/* মেইন কনটেন্ট এরিয়া */}
-      <div className="flex flex-col flex-1 p-4 max-w-md mx-auto w-full">
+      
+      {/* ওপরের স্ট্যাটাস বার বা হেডার (আপনার অরিজিনাল ডিজাইনের মতো) */}
+      <div className="w-full max-w-md mx-auto p-4">
         
-        {/* ওপরের ওয়ালেট হেডার ও কানেক্ট স্ট্যাটাস */}
-        <div className="flex justify-between items-start mb-6 pt-2">
+        {/* টপ ওয়ালেট হেডার */}
+        <div className="flex justify-between items-center mb-5 pt-2">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">My Wallet</h1>
+            <h1 className="text-xl font-bold tracking-tight text-white">My Wallet</h1>
             <p className="text-xs text-gray-400 mt-0.5">TON & USDT Network</p>
           </div>
-          <div className="bg-[#161b22] border border-gray-800 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <div className="bg-[#12161c] border border-gray-800 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500"></span>
             <span className="text-xs text-green-400 font-medium">Connected</span>
           </div>
         </div>
 
-        {/* ইউএসডিটি ব্যালেন্স ও বাটন কার্ড */}
+        {/* ব্যালেন্স এবং বাটন কার্ড */}
         <div className="bg-[#12161c] border border-gray-800/80 rounded-2xl p-5 mb-4 shadow-xl">
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-green-500 text-black px-1.5 py-0.5 rounded-full text-xs font-bold">₮</span>
@@ -54,17 +71,17 @@ export default function Home() {
           </div>
           <div className="text-xs text-gray-400 mb-5">≈ $154.76 USD</div>
 
-          {/* Earn More এবং কাজ করা Withdraw বাটন */}
+          {/* Earn More এবং Withdraw বাটন */}
           <div className="grid grid-cols-2 gap-3">
             <button 
               onClick={() => setActiveTab("Earn")}
-              className="bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition shadow-md cursor-pointer"
+              className="bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition cursor-pointer"
             >
               Earn More
             </button>
             <button 
               onClick={() => setShowWithdrawModal(true)}
-              className="bg-[#1c222b] hover:bg-[#252b36] text-white font-bold py-3 rounded-xl text-sm border border-gray-800 transition shadow-md cursor-pointer"
+              className="bg-[#1c222b] hover:bg-[#252b36] text-white font-bold py-3 rounded-xl text-sm border border-gray-800 transition cursor-pointer"
             >
               Withdraw
             </button>
@@ -84,17 +101,18 @@ export default function Home() {
         {/* অ্যানাউন্সমেন্ট বক্সের নিচে সিক্রেট হিডেন এরিয়া (ডাবল ক্লিক করলে অ্যাডমিন প্যানেল খুলবে) */}
         <div 
           onClick={handleSecretClick}
-          className="w-full h-16 mt-4 cursor-default flex items-center justify-center text-transparent text-[1px]"
+          className="w-full h-12 mt-2 cursor-pointer flex items-center justify-center text-transparent text-[1px]"
         >
           Secret Admin Area
         </div>
 
       </div>
 
-      {/* উইথড্র পপআপ উইন্ডো */}
+      {/* উইথড্র পপআপ উইন্ডো (যেখানে আপনার দেওয়া ১০টি পেমেন্ট মেথড ড্রপডাউন আকারে থাকবে) */}
       {showWithdrawModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#161b22] border border-gray-800 rounded-2xl p-6 w-full max-w-sm text-white shadow-2xl">
+          <div className="bg-[#161b22] border border-gray-800 rounded-2xl p-6 w-full max-w-sm text-white shadow-2xl relative">
+            
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Withdraw USDT</h3>
               <button 
@@ -106,23 +124,42 @@ export default function Home() {
             </div>
             
             <form onSubmit={handleWithdraw} className="space-y-4">
+              {/* পেমেন্ট মেথড সিলেকশন */}
               <div>
-                <label className="block text-xs text-gray-400 mb-1">পরিমাণ (USDT)</label>
+                <label className="block text-xs text-gray-400 mb-1.5">পেমেন্ট মেথড সিলেক্ট করুন</label>
+                <select 
+                  value={selectedPaymentMethod}
+                  onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                  className="w-full bg-[#0d1117] border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500 cursor-pointer"
+                >
+                  {paymentMethods.map((method) => (
+                    <option key={method} value={method} className="bg-[#161b22] text-white">
+                      {method}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* পরিমাণ ইনপুট */}
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">পরিমাণ (Amount)</label>
                 <input 
                   type="number"
-                  placeholder="কত USDT উইথড্র করবেন?"
+                  placeholder="কত পরিমাণ উইথড্র করবেন?"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full bg-[#0d1117] border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500"
                 />
               </div>
+
               <button 
                 type="submit"
-                className="w-full bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition shadow-md cursor-pointer"
+                className="w-full bg-[#20c997] hover:bg-[#1ba87f] text-black font-bold py-3 rounded-xl text-sm transition cursor-pointer mt-2"
               >
                 Confirm Withdraw
               </button>
             </form>
+
           </div>
         </div>
       )}
@@ -165,6 +202,7 @@ export default function Home() {
           <span className="text-[10px] font-medium">Airdrop</span>
         </div>
       </div>
+
     </div>
   );
 }
