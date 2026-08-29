@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Airdrop() {
   const [activeTab, setActiveTab] = useState("Airdrop");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   
-  // ব্যালেন্স স্টেট (উইথড্র করলে সাথে সাথে মাইনাস হয়ে যাবে)
-  const [balance, setBalance] = useState(154.76);
+  // LocalStorage থেকে ব্যালেন্স লোড করার ব্যবস্থা (যাতে পেজ রিফ্রেশ বা ব্যাক করলে ব্যালেন্স রিভার্ট না হয়)
+  const [balance, setBalance] = useState<number>(() => {
+    const savedBalance = localStorage.getItem("airdrop_user_balance");
+    return savedBalance !== null ? parseFloat(savedBalance) : 154.76;
+  });
   
   const [amount, setAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("বিকাশ (bKash)");
   const [accountDetails, setAccountDetails] = useState("");
   const navigate = useNavigate();
+
+  // ব্যালেন্স পরিবর্তন হলে তা LocalStorage-এ সেভ করে রাখা
+  useEffect(() => {
+    localStorage.setItem("airdrop_user_balance", balance.toString());
+  }, [balance]);
 
   // একদম নিচের সিক্রেট অ্যাডমিন প্যানেল খোলার ফাংশন (ডাবল ক্লিক করলে ওপেন হবে)
   const handleSecretAdminClick = (e: React.MouseEvent) => {
@@ -20,7 +28,7 @@ export default function Airdrop() {
     }
   };
 
-  // ইনস্ট্যান্ট উইথড্র ও ব্যালেন্স কাটার লজিক (মিনিমাম ১০ ইউএসডি চেক)
+  // ইনস্ট্যান্ট উইথড্র ও ব্যালেন্স স্থায়ীভাবে কাটার লজিক
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
     const withdrawAmount = parseFloat(amount);
@@ -45,11 +53,12 @@ export default function Airdrop() {
       return;
     }
 
-    // সঙ্গে সঙ্গে ব্যালেন্স থেকে কেটে নেওয়া
+    // সঙ্গে সঙ্গে ব্যালেন্স স্থায়ীভাবে কেটে নেওয়া
     const updatedBalance = balance - withdrawAmount;
-    setBalance(Number(updatedBalance.toFixed(2)));
+    const finalBalance = Number(updatedBalance.toFixed(2));
+    setBalance(finalBalance);
 
-    alert(`✅ সফলভাবে উইথড্র রিকোয়েস্ট গ্রহণ করা হয়েছে!\n\n💳 মেথড: ${selectedPaymentMethod}\n📌 অ্যাকাউন্ট/অ্যাড্রেস: ${accountDetails}\n💸 উইথড্র: ${withdrawAmount} USDT\n💰 অবশিষ্ট ব্যালেন্স: ${updatedBalance.toFixed(2)} USDT`);
+    alert(`✅ সফলভাবে উইথড্র রিকোয়েস্ট গ্রহণ করা হয়েছে!\n\n💳 মেথড: ${selectedPaymentMethod}\n📌 অ্যাকাউন্ট/অ্যাড্রেস: ${accountDetails}\n💸 উইথড্র: ${withdrawAmount} USDT\n💰 অবশিষ্ট ব্যালেন্স: ${finalBalance} USDT`);
     
     setShowWithdrawModal(false);
     setAmount("");
@@ -152,7 +161,7 @@ export default function Airdrop() {
           </p>
         </div>
 
-        {/* নিচের দিকে পর্যাপ্ত স্পেস ও সিক্রেট অ্যাডমিন প্যানেল এরিয়া (যা স্ক্রোল করে নিচে বের করতে হবে) */}
+        {/* নিচের দিকে পর্যাপ্ত স্পেস ও সিক্রেট অ্যাডমিন প্যানেল এরিয়া (স্ক্রোল করে নিচে বের করতে হবে) */}
         <div className="pt-24 pb-12 flex flex-col items-center justify-center text-center">
           <div className="text-[11px] text-gray-600 font-medium mb-1">Airdrop v2.4.1 Secure Protocol</div>
           
