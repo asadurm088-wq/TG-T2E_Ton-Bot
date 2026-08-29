@@ -1,75 +1,85 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
 
-export default function Home() {
-  const [balance, setBalance] = useState(() => {
-    const saved = localStorage.getItem("balance") || localStorage.getItem("user_balance");
-    return saved ? parseInt(saved, 10) : 1519594;
-  });
+export function Admin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      const updated = localStorage.getItem("balance") || localStorage.getItem("user_balance");
-      if (updated) {
-        setBalance(parseInt(updated, 10));
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    // লোকাল স্টোরেজ থেকে উইথড্র রিকোয়েস্টগুলো লোড করা
+    const savedRequests = localStorage.getItem('withdraw_requests');
+    if (savedRequests) {
+      setWithdrawals(JSON.parse(savedRequests));
+    }
   }, []);
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // পাসওয়ার্ড চেক (এখানে পাসওয়ার্ড 12345 সেট করা আছে)
+    if (password === '12345') {
+      setIsAuthenticated(true);
+    } else {
+      alert('ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।');
+    }
+  };
+
+  const handleStatusChange = (index: number, newStatus: string) => {
+    const updatedWithdrawals = [...withdrawals];
+    updatedWithdrawals[index].status = newStatus;
+    setWithdrawals(updatedWithdrawals);
+    localStorage.setItem('withdraw_requests', JSON.stringify(updatedWithdrawals));
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5' }}>
+        <form onSubmit={handleLogin} style={{ padding: '30px', background: 'white', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+          <h2>অ্যাডমিন প্যানেল লগইন</h2>
+          <input
+            type="password"
+            placeholder="পাসওয়ার্ড দিন (12345)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ padding: '10px', margin: '15px 0', width: '200px', display: 'block', border: '1px solid #ccc', borderRadius: '5px' }}
+          />
+          <button type="submit" style={{ padding: '10px 20px', background: '#0088cc', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            লগইন করুন
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
-    <div className="py-6 bg-black p-4 flex flex-col items-center min-h-screen text-white pb-24">
-      
-      {/* টপ হেডার / ওয়ালেট স্ট্যাটাস */}
-      <div className="w-full max-w-md flex justify-between items-center mb-6 px-2">
-        <div>
-          <h1 className="text-xl font-bold text-white">My Wallet</h1>
-          <p className="text-xs text-gray-400">TON & USDT Network</p>
-        </div>
-        <div className="bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-full text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Connected
-        </div>
-      </div>
-
-      {/* বাইনান্স/বাইবিট স্টাইল মেইন USDT ব্যালেন্স কার্ড */}
-      <div className="w-full max-w-md bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-800 p-6 rounded-3xl shadow-2xl flex flex-col items-center my-2">
-        
-        <div className="flex items-center gap-2 mb-2 bg-zinc-800/80 border border-zinc-700/60 px-4 py-1.5 rounded-full">
-          <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-black font-bold text-xs shadow">
-            ₮
-          </div>
-          <span className="text-sm font-bold tracking-wider text-white">USDT Balance</span>
-        </div>
-
-        {/* প্রিমিয়াম ছোট অ্যামাউন্ট ব্যালেন্স */}
-        <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 my-2">
-          {(balance * 0.0001).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xl font-bold text-emerald-400">USDT</span>
-        </div>
-
-        <div className="text-xs text-gray-400 font-medium bg-black/40 px-3 py-1 rounded-md border border-zinc-800/80 mt-1">
-          ≈ ${(balance * 0.0001).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
-        </div>
-
-        {/* কুইক অ্যাকশন বাটন (সঠিক পেজ রাউট সহ) */}
-        <div className="grid grid-cols-2 gap-3 w-full mt-6">
-          <Link to="/earn" className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-2.5 rounded-xl text-center text-sm transition">
-            Earn More
-          </Link>
-          <Link to="/airdrop" className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-xl text-center text-sm transition border border-zinc-700">
-            Withdraw
-          </Link>
-        </div>
-
-      </div>
-
-      {/* কুইক নোটিশ বা ব্যানার সেকশন */}
-      <div className="w-full max-w-md bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl mt-4">
-        <h3 className="text-sm font-bold text-yellow-500 mb-1">📢 Announcement</h3>
-        <p className="text-xs text-gray-400">Complete tasks from the Earn tab to get instant USDT rewards directly in your balance.</p>
-      </div>
-
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
+      <h2>অ্যাডমিন ড্যাশবোর্ড - উইথড্র রিকোয়েস্ট</h2>
+      {withdrawals.length === 0 ? (
+        <p>কোনো উইথড্র রিকোয়েস্ট পাওয়া যায়নি।</p>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+          <thead>
+            <tr style={{ background: '#f4f4f4', borderBottom: '2px solid #ddd' }}>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>ইউজার</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>টাকা/অ্যামাউন্ট</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>স্ট্যাটাস</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody>
+            {withdrawals.map((req, index) => (
+              <tr key={index} style={{ textAlign: 'center' }}>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.user || 'Unknown'}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.amount}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.status || 'Pending'}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>
+                  <button onClick={() => handleStatusChange(index, 'Approved')} style={{ marginRight: '5px', background: 'green', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>এপ্রুভ</button>
+                  <button onClick={() => handleStatusChange(index, 'Rejected')} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>বাতিল</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
-}
+                    }
