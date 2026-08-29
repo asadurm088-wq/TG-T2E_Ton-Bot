@@ -5,15 +5,15 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("Exchange");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   
-  // LocalStorage থেকে ব্যালেন্স ডাইনামিক ও পার্মানেন্টলি লোড করা
+  // গ্লোবাল বা কমন கீ (shared_app_balance) ব্যবহার করা হয়েছে যাতে সব পেজে ব্যালেন্স এক থাকে
   const [balance, setBalance] = useState<number>(() => {
-    const savedBalance = localStorage.getItem("app_user_balance");
+    const savedBalance = localStorage.getItem("shared_app_balance");
     return savedBalance !== null ? parseFloat(savedBalance) : 154.76;
   });
   
-  // কয়বার উইথড্র দেওয়া হয়েছে তার কাউন্টার (LocalStorage থেকে লোড হবে)
+  // গ্লোবাল উইথড্র কাউন্ট (shared_withdraw_count)
   const [withdrawCount, setWithdrawCount] = useState<number>(() => {
-    const savedCount = localStorage.getItem("app_withdraw_count");
+    const savedCount = localStorage.getItem("shared_withdraw_count");
     return savedCount !== null ? parseInt(savedCount, 10) : 0;
   });
   
@@ -22,13 +22,27 @@ export default function HomePage() {
   const [accountDetails, setAccountDetails] = useState("");
   const navigate = useNavigate();
 
-  // ব্যালেন্স ও কাউন্টার পরিবর্তন হলে তা localStorage-এ সেভ করে রাখা
+  // অন্য কোনো পেজ থেকে ব্যালেন্স পরিবর্তন হলে তা সাথে সাথে সিঙ্ক করার জন্য
   useEffect(() => {
-    localStorage.setItem("app_user_balance", balance.toString());
+    const handleStorageChange = () => {
+      const updatedBalance = localStorage.getItem("shared_app_balance");
+      if (updatedBalance !== null) setBalance(parseFloat(updatedBalance));
+
+      const updatedCount = localStorage.getItem("shared_withdraw_count");
+      if (updatedCount !== null) setWithdrawCount(parseInt(updatedCount, 10));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // ব্যালেন্স ও কাউন্টার পরিবর্তন হলে তা localStorage-এ গ্লোবালি সেভ করে রাখা
+  useEffect(() => {
+    localStorage.setItem("shared_app_balance", balance.toString());
   }, [balance]);
 
   useEffect(() => {
-    localStorage.setItem("app_withdraw_count", withdrawCount.toString());
+    localStorage.setItem("shared_withdraw_count", withdrawCount.toString());
   }, [withdrawCount]);
 
   // উইথড্র করার লজিক এবং কাউন্টার বাড়ানো
@@ -65,6 +79,10 @@ export default function HomePage() {
     // উইথড্র কাউন্ট ১ বাড়িয়ে দেওয়া
     const newCount = withdrawCount + 1;
     setWithdrawCount(newCount);
+
+    // লোকালস্টোরেজে তাৎক্ষণিকভাবে আপডেট পুশ করা
+    localStorage.setItem("shared_app_balance", finalBalance.toString());
+    localStorage.setItem("shared_withdraw_count", newCount.toString());
 
     alert(`✅ সফলভাবে উইথড্র রিকোয়েস্ট #${newCount} গ্রহণ করা হয়েছে!\n\n💳 মেথড: ${selectedPaymentMethod}\n📌 অ্যাকাউন্ট: ${accountDetails}\n💸 উইথড্র: ${withdrawAmount} USDT\n💰 অবশিষ্ট ব্যালেন্স: ${finalBalance} USDT`);
     
@@ -284,7 +302,10 @@ export default function HomePage() {
           <span className="text-[10px] font-bold tracking-tight">Earn</span>
         </div>
         <div 
-          onClick={() => setActiveTab("Airdrop")}
+          onClick={() => {
+            setActiveTab("Airdrop");
+            navigate("/airdrop"); // যদি আপনার রাউটার সেটআপ থাকে তবে সরাসরি Airdrop পেজে চলে যাবে
+          }}
           className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Airdrop" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">🪂</span>
