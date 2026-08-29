@@ -1,51 +1,48 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-export default function AdminPanel() {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [password, setPassword] = useState("");
-  const [requests, setRequests] = useState<any[]>([]);
+export function Admin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+
+  useEffect(() => {
+    // লোকাল স্টোরেজ থেকে উইথড্র রিকোয়েস্টগুলো লোড করা
+    const savedRequests = localStorage.getItem('withdraw_requests');
+    if (savedRequests) {
+      setWithdrawals(JSON.parse(savedRequests));
+    }
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "12345") { // এখানে আপনার ইচ্ছমতো পাসওয়ার্ড পাল্টে নিতে পারেন
-      setIsAdminLoggedIn(true);
-      loadRequests();
+    // পাসওয়ার্ড চেক (এখানে পাসওয়ার্ড 12345 সেট করা আছে)
+    if (password === '12345') {
+      setIsAuthenticated(true);
     } else {
-      alert("ভুল পাসওয়ার্ড!");
+      alert('ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।');
     }
   };
 
-  const loadRequests = () => {
-    const saved = localStorage.getItem("admin_withdraw_requests");
-    if (saved) {
-      setRequests(JSON.parse(saved));
-    }
+  const handleStatusChange = (index: number, newStatus: string) => {
+    const updatedWithdrawals = [...withdrawals];
+    updatedWithdrawals[index].status = newStatus;
+    setWithdrawals(updatedWithdrawals);
+    localStorage.setItem('withdraw_requests', JSON.stringify(updatedWithdrawals));
   };
 
-  const markAsPaid = (id: number) => {
-    const updated = requests.map(req => {
-      if (req.id === id) {
-        return { ...req, status: "Paid" };
-      }
-      return req;
-    });
-    setRequests(updated);
-    localStorage.setItem("admin_withdraw_requests", JSON.stringify(updated));
-  };
-
-  if (!isAdminLoggedIn) {
+  if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4 text-white">
-        <form onSubmit={handleLogin} className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 w-full max-w-sm">
-          <h2 className="text-xl font-bold text-emerald-400 mb-4 text-center">Admin Login</h2>
-          <input 
-            type="password" 
-            placeholder="অ্যাডমিন পাসওয়ার্ড দিন (12345)" 
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5' }}>
+        <form onSubmit={handleLogin} style={{ padding: '30px', background: 'white', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+          <h2>অ্যাডমিন প্যানেল লগইন</h2>
+          <input
+            type="password"
+            placeholder="পাসওয়ার্ড দিন (12345)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-black border border-zinc-700 p-3 rounded-xl mb-4 text-white text-sm"
+            style={{ padding: '10px', margin: '15px 0', width: '200px', display: 'block', border: '1px solid #ccc', borderRadius: '5px' }}
           />
-          <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold p-3 rounded-xl text-sm transition">
+          <button type="submit" style={{ padding: '10px 20px', background: '#0088cc', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
             লগইন করুন
           </button>
         </form>
@@ -54,49 +51,35 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-4 text-white">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold text-emerald-400">অ্যাডমিন ড্যাশবোর্ড (উইথড্র লিস্ট)</h1>
-          <button 
-            onClick={() => setIsAdminLoggedIn(false)}
-            className="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-xl text-xs font-bold"
-          >
-            লগআউট
-          </button>
-        </div>
-
-        {requests.length === 0 ? (
-          <p className="text-gray-400 text-center mt-10 text-sm">এখনো কোনো উইথড্র রিকোয়েস্ট আসেনি।</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {requests.map((req) => (
-              <div key={req.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                  <p className="text-[10px] text-gray-400">সময়: {req.date}</p>
-                  <h3 className="font-bold text-white text-xs mt-1">মাধ্যম: {req.method}</h3>
-                  <p className="text-yellow-400 text-xs mt-0.5">একাউন্ট/ওয়ালেট: {req.wallet}</p>
-                  <p className="text-emerald-400 font-semibold text-xs mt-1">পরিমাণ: {req.amount}</p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-lg text-xs font-bold ${req.status === 'Paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                    {req.status}
-                  </span>
-                  {req.status !== 'Paid' && (
-                    <button 
-                      onClick={() => markAsPaid(req.id)}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs transition"
-                    >
-                      Paid দিন
-                    </button>
-                  )}
-                </div>
-              </div>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
+      <h2>অ্যাডমিন ড্যাশবোর্ড - উইথড্র রিকোয়েস্ট</h2>
+      {withdrawals.length === 0 ? (
+        <p>কোনো উইথড্র রিকোয়েস্ট পাওয়া যায়নি।</p>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+          <thead>
+            <tr style={{ background: '#f4f4f4', borderBottom: '2px solid #ddd' }}>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>ইউজার</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>টাকা/অ্যামাউন্ট</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>স্ট্যাটাস</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody>
+            {withdrawals.map((req, index) => (
+              <tr key={index} style={{ textAlign: 'center' }}>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.user || 'Unknown'}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.amount}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{req.status || 'Pending'}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>
+                  <button onClick={() => handleStatusChange(index, 'Approved')} style={{ marginRight: '5px', background: 'green', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>এপ্রুভ</button>
+                  <button onClick={() => handleStatusChange(index, 'Rejected')} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>বাতিল</button>
+                </td>
+              </tr>
             ))}
-          </div>
-        )}
-      </div>
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
