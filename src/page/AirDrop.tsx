@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function Airdrop() {
   const [activeTab, setActiveTab] = useState("Airdrop");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false); // টন কানেক্ট পপআপের জন্য স্টেট
   
   // হোমপেজের সাথে সিঙ্ক রাখার জন্য কমন কি (shared_app_balance) ব্যবহার করা হলো
   const [balance, setBalance] = useState<number>(() => {
@@ -114,31 +115,35 @@ export default function Airdrop() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full max-w-[420px] mx-auto bg-[#07090e] text-white justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden">
+    <div className="flex flex-col h-screen w-full max-w-[420px] mx-auto bg-[#07090e] text-white justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden relative">
       
       {/* স্ক্রিন কনটেন্ট */}
       <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
         
-        {/* ইনকামিং ক্যাশ ব্যানার (এর ওপরের অতিরিক্ত Connect Wallet বাটনটি এখান থেকে বাদ দেওয়া হয়েছে) */}
-        <div className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg mb-2 mt-2">
-          <div className="bg-[#0f141f] rounded-2xl py-3 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
+        {/* ইনকামিং ক্যাশ ব্যানার (একদম উপরে) */}
+        <div className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg">
+          <div className="bg-[#0f141f] rounded-2xl py-2.5 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
-            <h1 className="text-2xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-purple-300 to-amber-300 drop-shadow-md font-serif italic" style={{ fontFamily: 'Georgia, serif' }}>
+            <h1 className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-purple-300 to-amber-300 drop-shadow-md font-serif italic" style={{ fontFamily: 'Georgia, serif' }}>
               Incoming Cash
             </h1>
           </div>
         </div>
 
-        {/* ওয়ালেট টাইটেল */}
+        {/* ওয়ালেট টাইটেল এবং ২ নম্বর জায়গায় কানেক্ট ওয়ালেট বাটন */}
         <div className="flex justify-between items-center pt-1">
           <div>
             <h2 className="text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Airdrop Wallet</h2>
             <p className="text-[11px] text-indigo-400 font-medium mt-0.5">TON & USDT Secure Network</p>
           </div>
-          <div className="bg-[#121926] border border-emerald-500/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-[11px] text-emerald-400 font-bold tracking-wide">Connected</span>
-          </div>
+          
+          {/* ২ নম্বর পজিশনের Connect Wallet বাটন (এটিতে ক্লিক করলে টন কানেক্ট পপআপ আসবে) */}
+          <button 
+            onClick={() => setShowWalletModal(true)}
+            className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-950/40 transition active:scale-95 cursor-pointer"
+          >
+            <span>💎</span> Connect Wallet
+          </button>
         </div>
 
         {/* ব্যালেন্স কার্ড */}
@@ -191,6 +196,105 @@ export default function Airdrop() {
         </div>
 
       </div>
+
+      {/* TON Connect পপআপ মডাল (আপনার দেওয়া ছবির ডিজাইনের মতো) */}
+      {showWalletModal && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50 animate-fadeIn">
+          <div className="bg-[#121824] border-t border-gray-800 rounded-t-3xl p-5 w-full max-w-[420px] text-white shadow-2xl relative max-h-[85vh] overflow-y-auto">
+            
+            {/* ক্লোজ বাটন */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="w-8 h-8 bg-gray-800/60 rounded-full flex items-center justify-center text-gray-400 text-xs">
+                ❖
+              </div>
+              <button 
+                onClick={() => setShowWalletModal(false)}
+                className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition cursor-pointer text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-center mb-5">
+              <h3 className="text-lg font-black text-white tracking-wide mb-1.5">Connect your wallet</h3>
+              <p className="text-xs text-gray-400 px-4 leading-relaxed">
+                Open Wallet in Telegram or select your wallet to connect
+              </p>
+            </div>
+
+            {/* Telegram Wallet বাটন */}
+            <button 
+              onClick={() => {
+                alert("🚀 Opening Telegram Wallet...");
+                setShowWalletModal(false);
+              }}
+              className="w-full bg-[#0098ea] hover:bg-[#0082cc] text-white font-extrabold py-3.5 px-4 rounded-2xl flex items-center justify-between transition shadow-lg shadow-sky-950/50 mb-5 cursor-pointer active:scale-95"
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 bg-white/20 rounded-xl flex items-center justify-center text-base">💳</span>
+                <span className="text-sm font-bold">Open Wallet in Telegram</span>
+              </div>
+              <span className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-xs font-black">✈</span>
+            </button>
+
+            {/* অন্যান্য ওয়ালেট লিস্ট */}
+            <div className="grid grid-cols-4 gap-3 mb-6">
+              
+              <div 
+                onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }}
+                className="flex flex-col items-center cursor-pointer group"
+              >
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+                  <span className="text-2xl">💎</span>
+                </div>
+                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonkeeper</span>
+              </div>
+
+              <div 
+                onClick={() => { alert("Connecting Gram Wallet..."); setShowWalletModal(false); }}
+                className="flex flex-col items-center cursor-pointer group"
+              >
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+                  <span className="text-2xl">🔷</span>
+                </div>
+                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Gram Wallet</span>
+              </div>
+
+              <div 
+                onClick={() => { alert("Connecting My Wallet..."); setShowWalletModal(false); }}
+                className="flex flex-col items-center cursor-pointer group"
+              >
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+                  <span className="text-2xl">📈</span>
+                </div>
+                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">My Wallet</span>
+              </div>
+
+              <div 
+                onClick={() => { alert("Connecting Tonhub..."); setShowWalletModal(false); }}
+                className="flex flex-col items-center cursor-pointer group"
+              >
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+                  <span className="text-2xl">🟣</span>
+                </div>
+                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonhub</span>
+              </div>
+
+            </div>
+
+            {/* ফুটার */}
+            <div className="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs text-gray-400">
+              <div className="flex items-center gap-1.5 font-bold text-sky-400">
+                <span>💠</span> TON Connect
+              </div>
+              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-400 cursor-pointer">
+                ?
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* উইথড্র পপআপ */}
       {showWithdrawModal && (
