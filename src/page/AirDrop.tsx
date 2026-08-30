@@ -6,7 +6,6 @@ export default function Airdrop() {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
   
-  // হোমপেজ বা অন্যান্য পেজের সাথে ব্যালেন্স সিঙ্ক রাখার জন্য
   const [balance, setBalance] = useState<number>(() => {
     const savedBalance = localStorage.getItem("shared_app_balance");
     return savedBalance !== null ? parseFloat(savedBalance) : 124.76;
@@ -31,14 +30,12 @@ export default function Airdrop() {
     localStorage.setItem("shared_app_balance", balance.toString());
   }, [balance]);
 
-  // সিক্রেট অ্যাডমিন প্যানেল ট্রিগার (ডাবল ক্লিক)
   const handleSecretAdminClick = (e: React.MouseEvent) => {
     if (e.detail === 2) {
       navigate("/admin");
     }
   };
 
-  // উইথড্র এবং অ্যাডমিন প্যানেলে রিকোয়েস্ট পাঠানোর লজিক
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
     const withdrawAmount = parseFloat(amount);
@@ -69,7 +66,6 @@ export default function Airdrop() {
     setBalance(finalBalance);
     localStorage.setItem("shared_app_balance", finalBalance.toString());
 
-    // অ্যাডমিন প্যানেলের জন্য রিকোয়েস্ট সেভ করা
     const existingRequests = JSON.parse(localStorage.getItem("withdraw_requests") || "[]");
     const newRequest = {
       user: accountDetails,
@@ -109,12 +105,12 @@ export default function Airdrop() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full max-w-[420px] mx-auto bg-[#07090e] text-white justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden relative">
+    <div style={{ backgroundColor: '#07090e', color: '#ffffff' }} className="flex flex-col h-screen w-full max-w-[420px] mx-auto justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden relative">
       
       {/* মূল স্ক্রিন কনটেন্ট */}
       <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
         
-        {/* ১. ইনকামিং ক্যাশ ব্যানার (ছবির হুবহু ডিজাইন) */}
+        {/* ১. ইনকামিং ক্যাশ ব্যানার */}
         <div className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg">
           <div className="bg-[#0f141f] rounded-2xl py-2.5 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
@@ -130,7 +126,7 @@ export default function Airdrop() {
         {/* ২. ওয়ালেট টাইটেল এবং কানেক্ট ওয়ালেট বাটন */}
         <div className="flex justify-between items-center pt-1">
           <div>
-            <h2 className="text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Airdrop Wallet</h2>
+            <h2 className="text-xl font-black tracking-tight text-white">Airdrop Wallet</h2>
             <p className="text-[11px] text-indigo-400 font-medium mt-0.5">TON & USDT Secure Network</p>
           </div>
           
@@ -143,7 +139,7 @@ export default function Airdrop() {
         </div>
 
         {/* ৩. ব্যালেন্স কার্ড */}
-        <div className="bg-gradient-to-br from-[#111827] via-[#0f172a] to-[#0b0f19] border border-gray-800/80 rounded-2xl p-4 shadow-xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#111827] via-[#0f172a] to-[#0b0f19] border border-gray-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="bg-emerald-500 text-gray-950 px-2 py-0.5 rounded-md text-[11px] font-black">₮</span>
             <span className="text-[11px] text-gray-300 font-semibold uppercase tracking-wider">USDT BALANCE</span>
@@ -171,7 +167,7 @@ export default function Airdrop() {
         </div>
 
         {/* ৪. অ্যানাউন্সমেন্ট বক্স */}
-        <div className="bg-[#0f141f] border border-gray-800/80 rounded-2xl p-3.5 text-center shadow-md">
+        <div className="bg-[#0f141f] border border-gray-800 rounded-2xl p-3.5 text-center shadow-md">
           <div className="text-amber-400 font-bold text-xs mb-1 flex items-center justify-center gap-1.5 uppercase tracking-wider">
             <span>📢</span> ANNOUNCEMENT
           </div>
@@ -182,10 +178,10 @@ export default function Airdrop() {
 
         {/* ৫. সিক্রেট অ্যাডমিন প্যানেল ট্রিগার */}
         <div className="pt-2 pb-2 flex flex-col items-center justify-center text-center">
-          <div className="text-[10px] text-gray-600 font-medium mb-1">Airdrop v2.4.1 Secure Protocol</div>
+          <div className="text-[10px] text-gray-500 font-medium mb-1">Airdrop v2.4.1 Secure Protocol</div>
           <div 
             onClick={handleSecretAdminClick}
-            className="px-3 py-1.5 bg-[#0a0d14] border border-gray-900 rounded-lg cursor-pointer text-[10px] text-gray-700 hover:text-gray-500 transition select-none shadow-inner"
+            className="px-3 py-1.5 bg-[#0a0d14] border border-gray-900 rounded-lg cursor-pointer text-[10px] text-gray-400 hover:text-gray-200 transition select-none shadow-inner"
           >
             🔒 System Node: Active (Protected)
           </div>
@@ -195,16 +191,16 @@ export default function Airdrop() {
 
       {/* TON Connect পপআপ মডাল */}
       {showWalletModal && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50 animate-fadeIn">
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50">
           <div className="bg-[#121824] border-t border-gray-800 rounded-t-3xl p-5 w-full max-w-[420px] text-white shadow-2xl relative max-h-[85vh] overflow-y-auto">
             
             <div className="flex justify-between items-center mb-4">
-              <div className="w-8 h-8 bg-gray-800/60 rounded-full flex items-center justify-center text-gray-400 text-xs">
+              <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-gray-300 text-xs">
                 ❖
               </div>
               <button 
                 onClick={() => setShowWalletModal(false)}
-                className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition cursor-pointer text-sm font-bold"
+                className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-300 transition cursor-pointer text-sm font-bold"
               >
                 ✕
               </button>
@@ -217,13 +213,12 @@ export default function Airdrop() {
               </p>
             </div>
 
-            {/* Telegram Wallet বাটন */}
             <button 
               onClick={() => {
                 alert("🚀 Opening Telegram Wallet...");
                 setShowWalletModal(false);
               }}
-              className="w-full bg-[#0098ea] hover:bg-[#0082cc] text-white font-extrabold py-3.5 px-4 rounded-2xl flex items-center justify-between transition shadow-lg shadow-sky-950/50 mb-5 cursor-pointer active:scale-95"
+              className="w-full bg-[#0098ea] hover:bg-[#0082cc] text-white font-extrabold py-3.5 px-4 rounded-2xl flex items-center justify-between transition shadow-lg mb-5 cursor-pointer active:scale-95"
             >
               <div className="flex items-center gap-3">
                 <span className="w-7 h-7 bg-white/20 rounded-xl flex items-center justify-center text-base">💳</span>
@@ -232,54 +227,38 @@ export default function Airdrop() {
               <span className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-xs font-black">✈</span>
             </button>
 
-            {/* অন্যান্য ওয়ালেট লিস্ট */}
             <div className="grid grid-cols-4 gap-3 mb-6">
-              <div 
-                onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }}
-                className="flex flex-col items-center cursor-pointer group"
-              >
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+              <div onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
                   <span className="text-2xl">💎</span>
                 </div>
                 <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonkeeper</span>
               </div>
-
-              <div 
-                onClick={() => { alert("Connecting Gram Wallet..."); setShowWalletModal(false); }}
-                className="flex flex-col items-center cursor-pointer group"
-              >
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+              <div onClick={() => { alert("Connecting Gram Wallet..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
                   <span className="text-2xl">🔷</span>
                 </div>
                 <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Gram Wallet</span>
               </div>
-
-              <div 
-                onClick={() => { alert("Connecting My Wallet..."); setShowWalletModal(false); }}
-                className="flex flex-col items-center cursor-pointer group"
-              >
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+              <div onClick={() => { alert("Connecting My Wallet..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
                   <span className="text-2xl">📈</span>
                 </div>
                 <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">My Wallet</span>
               </div>
-
-              <div 
-                onClick={() => { alert("Connecting Tonhub..."); setShowWalletModal(false); }}
-                className="flex flex-col items-center cursor-pointer group"
-              >
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700/60 rounded-2xl flex items-center justify-center shadow-md group-hover:border-sky-400 transition">
+              <div onClick={() => { alert("Connecting Tonhub..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
+                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
                   <span className="text-2xl">🟣</span>
                 </div>
                 <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonhub</span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs text-gray-400">
+            <div className="pt-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
               <div className="flex items-center gap-1.5 font-bold text-sky-400">
                 <span>💠</span> TON Connect
               </div>
-              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-400 cursor-pointer">
+              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 cursor-pointer">
                 ?
               </div>
             </div>
@@ -300,7 +279,7 @@ export default function Airdrop() {
               </div>
               <button 
                 onClick={() => setShowWithdrawModal(false)}
-                className="w-7 h-7 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-white font-bold transition cursor-pointer text-xs"
+                className="w-7 h-7 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-300 font-bold transition cursor-pointer text-xs"
               >
                 ✕
               </button>
@@ -369,42 +348,42 @@ export default function Airdrop() {
         </div>
       )}
 
-      {/* ৬. বটম নেভিগেশন বার (ছবির সাথে হুবহু মিল রেখে আপডেট করা) */}
+      {/* বটম নেভিগেশন বার */}
       <div className="grid grid-cols-5 items-center bg-[#0c1017] py-2 px-2 border-t border-gray-800 w-full shrink-0 shadow-2xl">
         <div 
           onClick={() => {
             setActiveTab("Exchange");
             navigate("/");
           }}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Exchange" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
+          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Exchange" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">🟡</span>
           <span className="text-[9px] font-bold tracking-tight">Exchange</span>
         </div>
         <div 
           onClick={() => setActiveTab("Mine")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Mine" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
+          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Mine" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">⛏️</span>
           <span className="text-[9px] font-bold tracking-tight">Mine</span>
         </div>
         <div 
           onClick={() => setActiveTab("Friends")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Friends" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
+          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Friends" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">👥</span>
           <span className="text-[9px] font-bold tracking-tight">Friends</span>
         </div>
         <div 
           onClick={() => setActiveTab("Earn")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Earn" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
+          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Earn" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">💰</span>
           <span className="text-[9px] font-bold tracking-tight">Earn</span>
         </div>
         <div 
           onClick={() => setActiveTab("Airdrop")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Airdrop" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
+          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Airdrop" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
         >
           <span className="text-base mb-0.5">🪙</span>
           <span className="text-[9px] font-bold tracking-tight text-amber-400">Airdrop</span>
