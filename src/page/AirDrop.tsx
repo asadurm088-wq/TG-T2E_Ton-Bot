@@ -120,7 +120,7 @@ export default function Airdrop() {
       {/* স্ক্রিন কনটেন্ট */}
       <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
         
-        {/* ইনকামিং ক্যাশ ব্যানার (একদম উপরে) */}
+        {/* ১. ইনকামিং ক্যাশ ব্যানার (সবার উপরে) */}
         <div className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg">
           <div className="bg-[#0f141f] rounded-2xl py-2.5 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
@@ -130,14 +130,17 @@ export default function Airdrop() {
           </div>
         </div>
 
-        {/* ওয়ালেট টাইটেল এবং ২ নম্বর জায়গায় কানেক্ট ওয়ালেট বাটন */}
+        {/* ২. আপনার ছবির ডিজাইন অনুযায়ী গ্লোয়িং ডিভাইডার লাইন */}
+        <div className="w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_10px_rgba(34,211,238,0.6)] my-1"></div>
+
+        {/* ৩. ওয়ালেট টাইটেল এবং ডানে কানেক্ট ওয়ালেট বাটন */}
         <div className="flex justify-between items-center pt-1">
           <div>
             <h2 className="text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Airdrop Wallet</h2>
             <p className="text-[11px] text-indigo-400 font-medium mt-0.5">TON & USDT Secure Network</p>
           </div>
           
-          {/* ২ নম্বর পজিশনের Connect Wallet বাটন (এটিতে ক্লিক করলে টন কানেক্ট পপআপ আসবে) */}
+          {/* কানেক্ট ওয়ালেট বাটন (ক্লিক করলে টন কানেক্ট পপআপ আসবে) */}
           <button 
             onClick={() => setShowWalletModal(true)}
             className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-950/40 transition active:scale-95 cursor-pointer"
@@ -197,12 +200,11 @@ export default function Airdrop() {
 
       </div>
 
-      {/* TON Connect পপআপ মডাল (আপনার দেওয়া ছবির ডিজাইনের মতো) */}
+      {/* TON Connect পপআপ মডাল */}
       {showWalletModal && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50 animate-fadeIn">
           <div className="bg-[#121824] border-t border-gray-800 rounded-t-3xl p-5 w-full max-w-[420px] text-white shadow-2xl relative max-h-[85vh] overflow-y-auto">
             
-            {/* ক্লোজ বাটন */}
             <div className="flex justify-between items-center mb-4">
               <div className="w-8 h-8 bg-gray-800/60 rounded-full flex items-center justify-center text-gray-400 text-xs">
                 ❖
@@ -239,7 +241,6 @@ export default function Airdrop() {
 
             {/* অন্যান্য ওয়ালেট লিস্ট */}
             <div className="grid grid-cols-4 gap-3 mb-6">
-              
               <div 
                 onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }}
                 className="flex flex-col items-center cursor-pointer group"
@@ -279,10 +280,8 @@ export default function Airdrop() {
                 </div>
                 <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonhub</span>
               </div>
-
             </div>
 
-            {/* ফুটার */}
             <div className="pt-3 border-t border-gray-800/80 flex justify-between items-center text-xs text-gray-400">
               <div className="flex items-center gap-1.5 font-bold text-sky-400">
                 <span>💠</span> TON Connect
