@@ -17,24 +17,8 @@ export default function Airdrop() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      const updatedBalance = localStorage.getItem("shared_app_balance");
-      if (updatedBalance !== null) setBalance(parseFloat(updatedBalance));
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem("shared_app_balance", balance.toString());
   }, [balance]);
-
-  const handleSecretAdminClick = (e: React.MouseEvent) => {
-    if (e.detail === 2) {
-      navigate("/admin");
-    }
-  };
 
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,14 +50,6 @@ export default function Airdrop() {
     setBalance(finalBalance);
     localStorage.setItem("shared_app_balance", finalBalance.toString());
 
-    const existingRequests = JSON.parse(localStorage.getItem("withdraw_requests") || "[]");
-    const newRequest = {
-      user: accountDetails,
-      amount: `${withdrawAmount} USDT (${selectedPaymentMethod})`,
-      status: "Pending"
-    };
-    localStorage.setItem("withdraw_requests", JSON.stringify([newRequest, ...existingRequests]));
-
     alert(`✅ সফলভাবে উইথড্র রিকোয়েস্ট গ্রহণ করা হয়েছে!\n\n💳 মেথড: ${selectedPaymentMethod}\n📌 অ্যাকাউন্ট/অ্যাড্রেস: ${accountDetails}\n💸 উইথড্র: ${withdrawAmount} USDT\n💰 অবশিষ্ট ব্যালেন্স: ${finalBalance} USDT`);
     
     setShowWithdrawModal(false);
@@ -94,72 +70,61 @@ export default function Airdrop() {
     "ব্যাংক ট্রান্সফার (Bank Transfer)",
   ];
 
-  const getAccountPlaceholder = () => {
-    if (selectedPaymentMethod.includes("বিকাশ") || selectedPaymentMethod.includes("নগদ")) {
-      return "যেমন: 017XXXXXXXX";
-    } else if (selectedPaymentMethod.includes("USDT") || selectedPaymentMethod.includes("TON") || selectedPaymentMethod.includes("Binance")) {
-      return "যেমন: UQD... বা UID দিন";
-    } else {
-      return "আপনার সঠিক অ্যাকাউন্ট তথ্য দিন...";
-    }
-  };
-
   return (
-    <div style={{ backgroundColor: '#07090e', color: '#ffffff' }} className="flex flex-col h-screen w-full max-w-[420px] mx-auto justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden relative">
+    <div style={{ backgroundColor: '#07090e', color: '#ffffff', minHeight: '100vh', width: '100%', maxWidth: '420px', margin: '0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflowX: 'hidden', fontFamily: 'sans-serif' }}>
       
       {/* মূল স্ক্রিন কনটেন্ট */}
-      <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
+      <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
         
         {/* ১. ইনকামিং ক্যাশ ব্যানার */}
-        <div className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg">
-          <div className="bg-[#0f141f] rounded-2xl py-2.5 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
-            <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
-            <h1 className="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-purple-300 to-amber-300 drop-shadow-md font-serif italic" style={{ fontFamily: 'Georgia, serif' }}>
+        <div style={{ width: '100%', padding: '3px', borderRadius: '16px', background: 'linear-gradient(to right, #14b8a6, #4f46e5, #f59e0b)', marginBottom: '16px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)' }}>
+          <div style={{ backgroundColor: '#0f141f', borderRadius: '14px', padding: '10px 16px', textAlign: 'center', position: 'relative' }}>
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold', fontStyle: 'italic', fontFamily: 'Georgia, serif', background: 'linear-gradient(to right, #99f6e4, #e9d5ff, #fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', margin: 0 }}>
               Incoming Cash
             </h1>
           </div>
         </div>
 
         {/* গ্লোয়িং নীল ডিভাইডার লাইন */}
-        <div className="w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_10px_rgba(34,211,238,0.6)] my-1"></div>
+        <div style={{ width: '100%', height: '3px', background: 'linear-gradient(to right, transparent, #22d3ee, transparent)', borderRadius: '9999px', margin: '8px 0', boxShadow: '0 0 10px rgba(34,211,238,0.6)' }}></div>
 
         {/* ২. ওয়ালেট টাইটেল এবং কানেক্ট ওয়ালেট বাটন */}
-        <div className="flex justify-between items-center pt-1">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', marginBottom: '16px' }}>
           <div>
-            <h2 className="text-xl font-black tracking-tight text-white">Airdrop Wallet</h2>
-            <p className="text-[11px] text-indigo-400 font-medium mt-0.5">TON & USDT Secure Network</p>
+            <h2 style={{ fontSize: '18px', fontWeight: '900', margin: 0, color: '#ffffff' }}>Airdrop Wallet</h2>
+            <p style={{ fontSize: '11px', color: '#818cf8', margin: '2px 0 0 0' }}>TON & USDT Secure Network</p>
           </div>
           
           <button 
             onClick={() => setShowWalletModal(true)}
-            className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-950/40 transition active:scale-95 cursor-pointer"
+            style={{ background: 'linear-gradient(to right, #0ea5e9, #2563eb)', color: '#ffffff', padding: '6px 14px', borderRadius: '9999px', fontSize: '12px', fontWeight: 'bold', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(14, 165, 233, 0.4)' }}
           >
-            <span className="text-sm">💎</span> Connect Wallet
+            <span>💎</span> Connect Wallet
           </button>
         </div>
 
         {/* ৩. ব্যালেন্স কার্ড */}
-        <div className="bg-gradient-to-br from-[#111827] via-[#0f172a] to-[#0b0f19] border border-gray-800 rounded-2xl p-4 shadow-xl relative overflow-hidden">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="bg-emerald-500 text-gray-950 px-2 py-0.5 rounded-md text-[11px] font-black">₮</span>
-            <span className="text-[11px] text-gray-300 font-semibold uppercase tracking-wider">USDT BALANCE</span>
+        <div style={{ background: 'linear-gradient(to bottom right, #111827, #0f172a, #0b0f19)', border: '1px solid #1f2937', borderRadius: '16px', padding: '16px', marginBottom: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span style={{ backgroundColor: '#10b981', color: '#030712', padding: '1px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '900' }}>₮</span>
+            <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase' }}>USDT BALANCE</span>
           </div>
           
-          <div className="text-3xl font-black text-emerald-400 mb-1 tracking-tight">
-            {balance.toFixed(2)} <span className="text-base text-gray-200 font-bold">USDT</span>
+          <div style={{ fontSize: '30px', fontWeight: '900', color: '#34d399', marginBottom: '4px' }}>
+            {balance.toFixed(2)} <span style={{ fontSize: '16px', color: '#e5e7eb' }}>USDT</span>
           </div>
-          <div className="text-xs text-gray-400 mb-4 font-medium">≈ ${balance.toFixed(2)} USD</div>
+          <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>≈ ${balance.toFixed(2)} USD</div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <button 
               onClick={() => setActiveTab("Earn")}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-gray-950 font-extrabold py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-900/30 cursor-pointer active:scale-95"
+              style={{ background: 'linear-gradient(to right, #10b981, #14b8a6)', color: '#030712', fontWeight: '800', padding: '10px', borderRadius: '12px', fontSize: '12px', border: 'none', cursor: 'pointer' }}
             >
               Earn More
             </button>
             <button 
               onClick={() => setShowWithdrawModal(true)}
-              className="bg-[#1e293b] hover:bg-[#334155] text-white font-extrabold py-2.5 rounded-xl text-xs border border-gray-700 transition-all shadow-lg cursor-pointer active:scale-95"
+              style={{ backgroundColor: '#1e293b', color: '#ffffff', fontWeight: '800', padding: '10px', borderRadius: '12px', fontSize: '12px', border: '1px solid #334155', cursor: 'pointer' }}
             >
               Withdraw
             </button>
@@ -167,21 +132,21 @@ export default function Airdrop() {
         </div>
 
         {/* ৪. অ্যানাউন্সমেন্ট বক্স */}
-        <div className="bg-[#0f141f] border border-gray-800 rounded-2xl p-3.5 text-center shadow-md">
-          <div className="text-amber-400 font-bold text-xs mb-1 flex items-center justify-center gap-1.5 uppercase tracking-wider">
-            <span>📢</span> ANNOUNCEMENT
+        <div style={{ backgroundColor: '#0f141f', border: '1px solid #1f2937', borderRadius: '16px', padding: '14px', textAlign: 'center', marginBottom: '16px' }}>
+          <div style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: '12px', marginBottom: '4px', textTransform: 'uppercase' }}>
+            📢 ANNOUNCEMENT
           </div>
-          <p className="text-[11px] text-gray-400 leading-relaxed font-normal">
-            Complete tasks from the Earn tab to get instant USDT rewards. Minimum withdraw limit is <span className="text-emerald-400 font-bold">10 USDT</span>.
+          <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, lineHeight: '1.5' }}>
+            Complete tasks from the Earn tab to get instant USDT rewards. Minimum withdraw limit is <span style={{ color: '#34d399', fontWeight: 'bold' }}>10 USDT</span>.
           </p>
         </div>
 
         {/* ৫. সিক্রেট অ্যাডমিন প্যানেল ট্রিগার */}
-        <div className="pt-2 pb-2 flex flex-col items-center justify-center text-center">
-          <div className="text-[10px] text-gray-500 font-medium mb-1">Airdrop v2.4.1 Secure Protocol</div>
+        <div style={{ textAlign: 'center', paddingBottom: '10px' }}>
+          <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Airdrop v2.4.1 Secure Protocol</div>
           <div 
-            onClick={handleSecretAdminClick}
-            className="px-3 py-1.5 bg-[#0a0d14] border border-gray-900 rounded-lg cursor-pointer text-[10px] text-gray-400 hover:text-gray-200 transition select-none shadow-inner"
+            onClick={() => alert("System Node Active")}
+            style={{ display: 'inline-block', padding: '6px 12px', backgroundColor: '#0a0d14', border: '1px solid #111827', borderRadius: '8px', cursor: 'pointer', fontSize: '10px', color: '#9ca3af' }}
           >
             🔒 System Node: Active (Protected)
           </div>
@@ -191,75 +156,40 @@ export default function Airdrop() {
 
       {/* TON Connect পপআপ মডাল */}
       {showWalletModal && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-end justify-center z-50">
-          <div className="bg-[#121824] border-t border-gray-800 rounded-t-3xl p-5 w-full max-w-[420px] text-white shadow-2xl relative max-h-[85vh] overflow-y-auto">
+        <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ backgroundColor: '#121824', borderTop: '1px solid #1f2937', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '20px', width: '100%', maxWidth: '420px', color: '#ffffff', maxHeight: '85vh', overflowY: 'auto' }}>
             
-            <div className="flex justify-between items-center mb-4">
-              <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-gray-300 text-xs">
-                ❖
-              </div>
-              <button 
-                onClick={() => setShowWalletModal(false)}
-                className="w-8 h-8 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-300 transition cursor-pointer text-sm font-bold"
-              >
-                ✕
-              </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '32px', height: '32px', backgroundColor: '#1f2937', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>❖</div>
+              <button onClick={() => setShowWalletModal(false)} style={{ width: '32px', height: '32px', backgroundColor: '#1f2937', border: 'none', borderRadius: '50%', color: '#ffffff', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
             </div>
 
-            <div className="text-center mb-5">
-              <h3 className="text-lg font-black text-white tracking-wide mb-1.5">Connect your wallet</h3>
-              <p className="text-xs text-gray-400 px-4 leading-relaxed">
-                Open Wallet in Telegram or select your wallet to connect
-              </p>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '900', margin: '0 0 6px 0' }}>Connect your wallet</h3>
+              <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Open Wallet in Telegram or select your wallet to connect</p>
             </div>
 
-            <button 
-              onClick={() => {
-                alert("🚀 Opening Telegram Wallet...");
-                setShowWalletModal(false);
-              }}
-              className="w-full bg-[#0098ea] hover:bg-[#0082cc] text-white font-extrabold py-3.5 px-4 rounded-2xl flex items-center justify-between transition shadow-lg mb-5 cursor-pointer active:scale-95"
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 bg-white/20 rounded-xl flex items-center justify-center text-base">💳</span>
-                <span className="text-sm font-bold">Open Wallet in Telegram</span>
-              </div>
-              <span className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-xs font-black">✈</span>
+            <button onClick={() => { alert("🚀 Opening Telegram Wallet..."); setShowWalletModal(false); }} style={{ width: '100%', backgroundColor: '#0098ea', color: '#ffffff', fontWeight: 'bold', padding: '14px', borderRadius: '16px', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <span>💳 Open Wallet in Telegram</span>
+              <span>✈</span>
             </button>
 
-            <div className="grid grid-cols-4 gap-3 mb-6">
-              <div onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
-                  <span className="text-2xl">💎</span>
-                </div>
-                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonkeeper</span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
+              <div onClick={() => { alert("Connecting Tonkeeper..."); setShowWalletModal(false); }} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                <div style={{ height: '56px', backgroundColor: '#1a2333', border: '1px solid #374151', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>💎</div>
+                <span style={{ fontSize: '10px', color: '#d1d5db', display: 'block', marginTop: '6px' }}>Tonkeeper</span>
               </div>
-              <div onClick={() => { alert("Connecting Gram Wallet..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
-                  <span className="text-2xl">🔷</span>
-                </div>
-                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Gram Wallet</span>
+              <div onClick={() => { alert("Connecting Gram..."); setShowWalletModal(false); }} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                <div style={{ height: '56px', backgroundColor: '#1a2333', border: '1px solid #374151', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🔷</div>
+                <span style={{ fontSize: '10px', color: '#d1d5db', display: 'block', marginTop: '6px' }}>Gram</span>
               </div>
-              <div onClick={() => { alert("Connecting My Wallet..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
-                  <span className="text-2xl">📈</span>
-                </div>
-                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">My Wallet</span>
+              <div onClick={() => { alert("Connecting My Wallet..."); setShowWalletModal(false); }} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                <div style={{ height: '56px', backgroundColor: '#1a2333', border: '1px solid #374151', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>📈</div>
+                <span style={{ fontSize: '10px', color: '#d1d5db', display: 'block', marginTop: '6px' }}>My Wallet</span>
               </div>
-              <div onClick={() => { alert("Connecting Tonhub..."); setShowWalletModal(false); }} className="flex flex-col items-center cursor-pointer group">
-                <div className="w-14 h-14 bg-[#1a2333] border border-gray-700 rounded-2xl flex items-center justify-center shadow-md">
-                  <span className="text-2xl">🟣</span>
-                </div>
-                <span className="text-[11px] text-gray-300 font-medium mt-1.5 text-center">Tonhub</span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-gray-800 flex justify-between items-center text-xs text-gray-400">
-              <div className="flex items-center gap-1.5 font-bold text-sky-400">
-                <span>💠</span> TON Connect
-              </div>
-              <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 cursor-pointer">
-                ?
+              <div onClick={() => { alert("Connecting Tonhub..."); setShowWalletModal(false); }} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                <div style={{ height: '56px', backgroundColor: '#1a2333', border: '1px solid #374151', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🟣</div>
+                <span style={{ fontSize: '10px', color: '#d1d5db', display: 'block', marginTop: '6px' }}>Tonhub</span>
               </div>
             </div>
 
@@ -269,77 +199,36 @@ export default function Airdrop() {
 
       {/* উইথড্র পপআপ মডাল */}
       {showWithdrawModal && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-4 w-full max-w-xs text-white shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }}>
+          <div style={{ backgroundColor: '#0f172a', border: '1px solid #1f2937', borderRadius: '24px', padding: '20px', width: '100%', maxWidth: '320px', color: '#ffffff' }}>
             
-            <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-800">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #1f2937', paddingBottom: '10px' }}>
               <div>
-                <h3 className="text-sm font-extrabold text-white">Withdraw Cash</h3>
-                <p className="text-[10px] text-gray-400">মেথড বেছে নিন</p>
+                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>Withdraw Cash</h3>
+                <p style={{ fontSize: '10px', color: '#9ca3af', margin: 0 }}>মেথড বেছে নিন</p>
               </div>
-              <button 
-                onClick={() => setShowWithdrawModal(false)}
-                className="w-7 h-7 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center text-gray-300 font-bold transition cursor-pointer text-xs"
-              >
-                ✕
-              </button>
+              <button onClick={() => setShowWithdrawModal(false)} style={{ width: '28px', height: '28px', backgroundColor: '#1f2937', border: 'none', borderRadius: '50%', color: '#ffffff', cursor: 'pointer' }}>✕</button>
             </div>
 
-            <div className="bg-[#121926] border border-amber-500/30 rounded-xl p-2.5 mb-3 text-center">
-              <div className="text-amber-400 font-bold text-[11px] mb-0.5 flex items-center justify-center gap-1">
-                <span>⚠️</span> সর্বনিম্ন উত্তোলন: ১০ ইউএসডি (USD)
-              </div>
-              <p className="text-[10px] text-gray-300">
-                ২৪ ঘণ্টার মধ্যে পেমেন্ট পৌঁছে যাবে।
-              </p>
-            </div>
-            
-            <form onSubmit={handleWithdraw} className="space-y-2.5">
+            <form onSubmit={handleWithdraw} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-wider mb-1">পেমেন্ট মেথড</label>
-                <select 
-                  value={selectedPaymentMethod}
-                  onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                  className="w-full bg-[#111827] border border-gray-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
-                >
-                  {paymentMethods.map((method) => (
-                    <option key={method} value={method} className="bg-[#111827] text-white py-1">
-                      {method}
-                    </option>
-                  ))}
+                <label style={{ fontSize: '10px', fontWeight: 'bold', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>পেমেন্ট মেথড</label>
+                <select value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)} style={{ width: '100%', backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '10px', padding: '10px', fontSize: '12px', color: '#34d399' }}>
+                  {paymentMethods.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-wider mb-1">UID / ওয়ালেট এড্রেস / নম্বর</label>
-                <input 
-                  type="text"
-                  placeholder={getAccountPlaceholder()}
-                  value={accountDetails}
-                  onChange={(e) => setAccountDetails(e.target.value)}
-                  className="w-full bg-[#111827] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 placeholder-gray-500"
-                />
+                <label style={{ fontSize: '10px', fontWeight: 'bold', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>UID / ওয়ালেট এড্রেস / নম্বর</label>
+                <input type="text" placeholder="আপনার তথ্য দিন..." value={accountDetails} onChange={(e) => setAccountDetails(e.target.value)} style={{ width: '100%', backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '10px', padding: '10px', fontSize: '12px', color: '#ffffff', boxSizing: 'border-box' }} />
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">পরিমাণ (USD)</label>
-                  <span className="text-[9px] text-amber-400 font-semibold">মিনিমাম: ১০ USD</span>
-                </div>
-                <input 
-                  type="number"
-                  step="any"
-                  placeholder="কমপক্ষে ১০ লিখুন"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-full bg-[#111827] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 placeholder-gray-500"
-                />
+                <label style={{ fontSize: '10px', fontWeight: 'bold', color: '#9ca3af', display: 'block', marginBottom: '4px' }}>পরিমাণ (USD)</label>
+                <input type="number" step="any" placeholder="কমপক্ষে ১০" value={amount} onChange={(e) => setAmount(e.target.value)} style={{ width: '100%', backgroundColor: '#111827', border: '1px solid #374151', borderRadius: '10px', padding: '10px', fontSize: '12px', color: '#ffffff', boxSizing: 'border-box' }} />
               </div>
 
-              <button 
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black py-2.5 rounded-xl text-xs transition-all shadow-xl shadow-blue-900/40 cursor-pointer active:scale-95 mt-1"
-              >
+              <button type="submit" style={{ width: '100%', background: 'linear-gradient(to right, #2563eb, #4f46e5)', color: '#ffffff', fontWeight: 'bold', padding: '12px', borderRadius: '10px', border: 'none', cursor: 'pointer', marginTop: '6px' }}>
                 Confirm Withdraw
               </button>
             </form>
@@ -349,44 +238,26 @@ export default function Airdrop() {
       )}
 
       {/* বটম নেভিগেশন বার */}
-      <div className="grid grid-cols-5 items-center bg-[#0c1017] py-2 px-2 border-t border-gray-800 w-full shrink-0 shadow-2xl">
-        <div 
-          onClick={() => {
-            setActiveTab("Exchange");
-            navigate("/");
-          }}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Exchange" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
-        >
-          <span className="text-base mb-0.5">🟡</span>
-          <span className="text-[9px] font-bold tracking-tight">Exchange</span>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', backgroundColor: '#0c1017', padding: '8px 4px', borderTop: '1px solid #1f2937', width: '100%' }}>
+        <div onClick={() => { setActiveTab("Exchange"); navigate("/"); }} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Exchange" ? '#fbbf24' : '#6b7280' }}>
+          <div style={{ fontSize: '16px' }}>🟡</div>
+          <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Exchange</div>
         </div>
-        <div 
-          onClick={() => setActiveTab("Mine")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Mine" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
-        >
-          <span className="text-base mb-0.5">⛏️</span>
-          <span className="text-[9px] font-bold tracking-tight">Mine</span>
+        <div onClick={() => setActiveTab("Mine")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Mine" ? '#fbbf24' : '#6b7280' }}>
+          <div style={{ fontSize: '16px' }}>⛏️</div>
+          <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Mine</div>
         </div>
-        <div 
-          onClick={() => setActiveTab("Friends")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Friends" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
-        >
-          <span className="text-base mb-0.5">👥</span>
-          <span className="text-[9px] font-bold tracking-tight">Friends</span>
+        <div onClick={() => setActiveTab("Friends")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Friends" ? '#fbbf24' : '#6b7280' }}>
+          <div style={{ fontSize: '16px' }}>👥</div>
+          <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Friends</div>
         </div>
-        <div 
-          onClick={() => setActiveTab("Earn")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Earn" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
-        >
-          <span className="text-base mb-0.5">💰</span>
-          <span className="text-[9px] font-bold tracking-tight">Earn</span>
+        <div onClick={() => setActiveTab("Earn")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Earn" ? '#fbbf24' : '#6b7280' }}>
+          <div style={{ fontSize: '16px' }}>💰</div>
+          <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Earn</div>
         </div>
-        <div 
-          onClick={() => setActiveTab("Airdrop")}
-          className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Airdrop" ? "text-amber-400 scale-105" : "text-gray-400 hover:text-gray-200"}`}
-        >
-          <span className="text-base mb-0.5">🪙</span>
-          <span className="text-[9px] font-bold tracking-tight text-amber-400">Airdrop</span>
+        <div onClick={() => setActiveTab("Airdrop")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Airdrop" ? '#fbbf24' : '#6b7280' }}>
+          <div style={{ fontSize: '16px' }}>🪙</div>
+          <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Airdrop</div>
         </div>
       </div>
 
