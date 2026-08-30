@@ -235,7 +235,7 @@ export default function AirDrop() {
         </div>
       )}
 
-      {/* বটম নেভিগেশন বার */}
+      {/* বটম নেভিগেশন বার (স্ক্রিনশটের সাথে হুবহু মিল রেখে) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', backgroundColor: '#0c1017', padding: '8px 4px', borderTop: '1px solid #1f2937', width: '100%' }}>
         <div onClick={() => setActiveTab("Exchange")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Exchange" ? '#fbbf24' : '#6b7280' }}>
           <div style={{ fontSize: '16px' }}>🟡</div>
