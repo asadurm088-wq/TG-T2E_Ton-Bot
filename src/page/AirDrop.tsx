@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-export default function Airdrop() {
+export default function AirDrop() {
   const [activeTab, setActiveTab] = useState("Airdrop");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -14,7 +13,6 @@ export default function Airdrop() {
   const [amount, setAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("বিকাশ (bKash)");
   const [accountDetails, setAccountDetails] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.setItem("shared_app_balance", balance.toString());
@@ -239,7 +237,7 @@ export default function Airdrop() {
 
       {/* বটম নেভিগেশন বার */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', backgroundColor: '#0c1017', padding: '8px 4px', borderTop: '1px solid #1f2937', width: '100%' }}>
-        <div onClick={() => { setActiveTab("Exchange"); navigate("/"); }} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Exchange" ? '#fbbf24' : '#6b7280' }}>
+        <div onClick={() => setActiveTab("Exchange")} style={{ textAlign: 'center', cursor: 'pointer', color: activeTab === "Exchange" ? '#fbbf24' : '#6b7280' }}>
           <div style={{ fontSize: '16px' }}>🟡</div>
           <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Exchange</div>
         </div>
