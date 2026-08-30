@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 export default function Airdrop() {
   const [activeTab, setActiveTab] = useState("Airdrop");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-  const [showWalletModal, setShowWalletModal] = useState(false); // টন কানেক্ট পপআপের জন্য স্টেট
+  const [showWalletModal, setShowWalletModal] = useState(false);
   
-  // হোমপেজের সাথে সিঙ্ক রাখার জন্য কমন কি (shared_app_balance) ব্যবহার করা হলো
+  // হোমপেজ বা অন্যান্য পেজের সাথে ব্যালেন্স সিঙ্ক রাখার জন্য
   const [balance, setBalance] = useState<number>(() => {
     const savedBalance = localStorage.getItem("shared_app_balance");
-    return savedBalance !== null ? parseFloat(savedBalance) : 139.76;
+    return savedBalance !== null ? parseFloat(savedBalance) : 124.76;
   });
   
   const [amount, setAmount] = useState("");
@@ -17,7 +17,6 @@ export default function Airdrop() {
   const [accountDetails, setAccountDetails] = useState("");
   const navigate = useNavigate();
 
-  // অন্য কোনো পেজ থেকে ব্যালেন্স পরিবর্তন হলে তা সাথে সাথে সিঙ্ক করার জন্য
   useEffect(() => {
     const handleStorageChange = () => {
       const updatedBalance = localStorage.getItem("shared_app_balance");
@@ -32,14 +31,14 @@ export default function Airdrop() {
     localStorage.setItem("shared_app_balance", balance.toString());
   }, [balance]);
 
-  // সিক্রেট অ্যাডমিন প্যানেল খোলার ফাংশন (ডাবল ক্লিক)
+  // সিক্রেট অ্যাডমিন প্যানেল ট্রিগার (ডাবল ক্লিক)
   const handleSecretAdminClick = (e: React.MouseEvent) => {
     if (e.detail === 2) {
       navigate("/admin");
     }
   };
 
-  // ইনস্ট্যান্ট উইথড্র ও অ্যাডমিন প্যানেলে রিকোয়েস্ট পাঠানোর লজিক
+  // উইথড্র এবং অ্যাডমিন প্যানেলে রিকোয়েস্ট পাঠানোর লজিক
   const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
     const withdrawAmount = parseFloat(amount);
@@ -69,11 +68,6 @@ export default function Airdrop() {
     
     setBalance(finalBalance);
     localStorage.setItem("shared_app_balance", finalBalance.toString());
-
-    // উইথড্র কাউন্ট আপডেট করা
-    const currentCount = parseInt(localStorage.getItem("shared_withdraw_count") || "0", 10);
-    const newCount = currentCount + 1;
-    localStorage.setItem("shared_withdraw_count", newCount.toString());
 
     // অ্যাডমিন প্যানেলের জন্য রিকোয়েস্ট সেভ করা
     const existingRequests = JSON.parse(localStorage.getItem("withdraw_requests") || "[]");
@@ -117,10 +111,10 @@ export default function Airdrop() {
   return (
     <div className="flex flex-col h-screen w-full max-w-[420px] mx-auto bg-[#07090e] text-white justify-between select-none font-sans antialiased shadow-2xl border-x border-gray-900 overflow-hidden relative">
       
-      {/* স্ক্রিন কনটেন্ট */}
+      {/* মূল স্ক্রিন কনটেন্ট */}
       <div className="w-full p-4 flex-1 overflow-y-auto space-y-4">
         
-        {/* ১. ইনকামিং ক্যাশ ব্যানার (সবার উপরে) */}
+        {/* ১. ইনকামিং ক্যাশ ব্যানার (ছবির হুবহু ডিজাইন) */}
         <div className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-teal-500 via-indigo-600 to-amber-500 p-[1px] shadow-lg">
           <div className="bg-[#0f141f] rounded-2xl py-2.5 px-4 text-center relative overflow-hidden flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 via-purple-500/20 to-amber-500/20 opacity-60"></div>
@@ -130,30 +124,29 @@ export default function Airdrop() {
           </div>
         </div>
 
-        {/* ২. আপনার ছবির ডিজাইন অনুযায়ী গ্লোয়িং ডিভাইডার লাইন */}
+        {/* গ্লোয়িং নীল ডিভাইডার লাইন */}
         <div className="w-full h-[3px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_10px_rgba(34,211,238,0.6)] my-1"></div>
 
-        {/* ৩. ওয়ালেট টাইটেল এবং ডানে কানেক্ট ওয়ালেট বাটন */}
+        {/* ২. ওয়ালেট টাইটেল এবং কানেক্ট ওয়ালেট বাটন */}
         <div className="flex justify-between items-center pt-1">
           <div>
             <h2 className="text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Airdrop Wallet</h2>
             <p className="text-[11px] text-indigo-400 font-medium mt-0.5">TON & USDT Secure Network</p>
           </div>
           
-          {/* কানেক্ট ওয়ালেট বাটন (ক্লিক করলে টন কানেক্ট পপআপ আসবে) */}
           <button 
             onClick={() => setShowWalletModal(true)}
             className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-sky-950/40 transition active:scale-95 cursor-pointer"
           >
-            <span>💎</span> Connect Wallet
+            <span className="text-sm">💎</span> Connect Wallet
           </button>
         </div>
 
-        {/* ব্যালেন্স কার্ড */}
+        {/* ৩. ব্যালেন্স কার্ড */}
         <div className="bg-gradient-to-br from-[#111827] via-[#0f172a] to-[#0b0f19] border border-gray-800/80 rounded-2xl p-4 shadow-xl relative overflow-hidden">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="bg-emerald-500 text-gray-950 px-2 py-0.5 rounded-md text-[11px] font-black">₮</span>
-            <span className="text-[11px] text-gray-300 font-semibold uppercase tracking-wider">USDT Balance</span>
+            <span className="text-[11px] text-gray-300 font-semibold uppercase tracking-wider">USDT BALANCE</span>
           </div>
           
           <div className="text-3xl font-black text-emerald-400 mb-1 tracking-tight">
@@ -177,17 +170,17 @@ export default function Airdrop() {
           </div>
         </div>
 
-        {/* অ্যানাউন্সমেন্ট */}
+        {/* ৪. অ্যানাউন্সমেন্ট বক্স */}
         <div className="bg-[#0f141f] border border-gray-800/80 rounded-2xl p-3.5 text-center shadow-md">
           <div className="text-amber-400 font-bold text-xs mb-1 flex items-center justify-center gap-1.5 uppercase tracking-wider">
-            <span>📢</span> Announcement
+            <span>📢</span> ANNOUNCEMENT
           </div>
           <p className="text-[11px] text-gray-400 leading-relaxed font-normal">
             Complete tasks from the Earn tab to get instant USDT rewards. Minimum withdraw limit is <span className="text-emerald-400 font-bold">10 USDT</span>.
           </p>
         </div>
 
-        {/* সিক্রেট অ্যাডমিন প্যানেল ট্রিগার */}
+        {/* ৫. সিক্রেট অ্যাডমিন প্যানেল ট্রিগার */}
         <div className="pt-2 pb-2 flex flex-col items-center justify-center text-center">
           <div className="text-[10px] text-gray-600 font-medium mb-1">Airdrop v2.4.1 Secure Protocol</div>
           <div 
@@ -295,7 +288,7 @@ export default function Airdrop() {
         </div>
       )}
 
-      {/* উইথড্র পপআপ */}
+      {/* উইথড্র পপআপ মডাল */}
       {showWithdrawModal && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-[#0f172a] border border-gray-800 rounded-3xl p-4 w-full max-w-xs text-white shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -376,7 +369,7 @@ export default function Airdrop() {
         </div>
       )}
 
-      {/* বটম নেভিগেশন বার */}
+      {/* ৬. বটম নেভিগেশন বার (ছবির সাথে হুবহু মিল রেখে আপডেট করা) */}
       <div className="grid grid-cols-5 items-center bg-[#0c1017] py-2 px-2 border-t border-gray-800 w-full shrink-0 shadow-2xl">
         <div 
           onClick={() => {
@@ -385,7 +378,7 @@ export default function Airdrop() {
           }}
           className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Exchange" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
         >
-          <span className="text-base mb-0.5 font-black">🟡</span>
+          <span className="text-base mb-0.5">🟡</span>
           <span className="text-[9px] font-bold tracking-tight">Exchange</span>
         </div>
         <div 
@@ -413,7 +406,7 @@ export default function Airdrop() {
           onClick={() => setActiveTab("Airdrop")}
           className={`flex flex-col items-center cursor-pointer transition ${activeTab === "Airdrop" ? "text-amber-400 scale-105" : "text-gray-500 hover:text-gray-300"}`}
         >
-          <span className="text-base mb-0.5 font-black text-amber-400">🪂</span>
+          <span className="text-base mb-0.5">🪙</span>
           <span className="text-[9px] font-bold tracking-tight text-amber-400">Airdrop</span>
         </div>
       </div>
