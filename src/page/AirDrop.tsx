@@ -23,7 +23,6 @@ const PAYMENT_METHODS = [
 export default function AirDrop() {
   const [activeTab, setActiveTab] = useState<Tab>("Airdrop");
 
-  // Balance State
   const [balance, setBalance] = useState<number>(() => {
     if (typeof window === "undefined") return 124.76;
     const saved = localStorage.getItem("demo_airdrop_balance");
@@ -40,7 +39,6 @@ export default function AirDrop() {
   const [accountDetails, setAccountDetails] = useState("");
   const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0]);
 
-  // Admin Withdraw Requests State with LocalStorage
   const [withdrawRequests, setWithdrawRequests] = useState<WithdrawRequest[]>(() => {
     if (typeof window === "undefined") return [];
     const saved = localStorage.getItem("admin_withdraw_requests");
@@ -63,8 +61,7 @@ export default function AirDrop() {
     ];
   });
 
-  // Track total visits / active users simulation
-  const [totalVisits, setTotalVisits] = useState(142);
+  const [totalVisits] = useState(142);
 
   useEffect(() => {
     localStorage.setItem("demo_airdrop_balance", balance.toFixed(2));
@@ -106,7 +103,6 @@ export default function AirDrop() {
     const newBalance = Number((balance - withdrawAmount).toFixed(2));
     setBalance(newBalance);
 
-    // Add new request for Admin
     const newReq: WithdrawRequest = {
       id: "REQ-" + Math.floor(1000 + Math.random() * 9000),
       method: paymentMethod,
@@ -131,7 +127,6 @@ export default function AirDrop() {
     setAccountDetails("");
   };
 
-  // Admin action handlers
   const handleApprove = (id: string) => {
     setWithdrawRequests(
       withdrawRequests.map((req) => (req.id === id ? { ...req, status: "Approved" } : req))
@@ -142,19 +137,17 @@ export default function AirDrop() {
     setWithdrawRequests(
       withdrawRequests.map((req) => (req.id === id ? { ...req, status: "Rejected" } : req))
     );
-    // Refund balance on reject
     setBalance((prev) => Number((prev + reqAmount).toFixed(2)));
-    alert(`❌ Request rejected and ${reqAmount} USDT refunded to user balance.`);
+    alert(`❌ Request rejected and ${reqAmount} USDT refunded.`);
   };
 
   return (
     <div className="wallet-app">
       <main className="main-content">
-        {/* Secret trigger: Triple click on Incoming Cash card to open Admin Panel */}
         <section
           className="incoming-card"
           onClick={() => setShowAdminPanel(true)}
-          title="Click 3 times to open Admin Panel"
+          title="Click to open Admin Panel"
         >
           <div className="incoming-inner">
             <h1>Incoming Cash</h1>
@@ -185,62 +178,24 @@ export default function AirDrop() {
           />
         )}
 
-        {activeTab === "Earn" && (
-          <EarnContent onBack={() => changeTab("Airdrop")} />
-        )}
-
-        {activeTab === "Mine" && (
-          <MineContent onBack={() => changeTab("Airdrop")} />
-        )}
-
-        {activeTab === "Friends" && (
-          <FriendsContent onBack={() => changeTab("Airdrop")} />
-        )}
-
-        {activeTab === "Exchange" && (
-          <ExchangeContent onBack={() => changeTab("Airdrop")} />
-        )}
+        {activeTab === "Earn" && <EarnContent onBack={() => changeTab("Airdrop")} />}
+        {activeTab === "Mine" && <MineContent onBack={() => changeTab("Airdrop")} />}
+        {activeTab === "Friends" && <FriendsContent onBack={() => changeTab("Airdrop")} />}
+        {activeTab === "Exchange" && <ExchangeContent onBack={() => changeTab("Airdrop")} />}
 
         <section className="protocol">
           <div>Airdrop v2.5.0 Secure Protocol</div>
         </section>
       </main>
 
-      {/* Bottom Nav */}
       <nav className="bottom-nav">
-        <NavItem
-          icon="◈"
-          label="Exchange"
-          active={activeTab === "Exchange"}
-          onClick={() => changeTab("Exchange")}
-        />
-        <NavItem
-          icon="⛏"
-          label="Mine"
-          active={activeTab === "Mine"}
-          onClick={() => changeTab("Mine")}
-        />
-        <NavItem
-          icon="♟"
-          label="Friends"
-          active={activeTab === "Friends"}
-          onClick={() => changeTab("Friends")}
-        />
-        <NavItem
-          icon="☷"
-          label="Earn"
-          active={activeTab === "Earn"}
-          onClick={() => changeTab("Earn")}
-        />
-        <NavItem
-          icon="◎"
-          label="Airdrop"
-          active={activeTab === "Airdrop"}
-          onClick={() => changeTab("Airdrop")}
-        />
+        <NavItem icon="◈" label="Exchange" active={activeTab === "Exchange"} onClick={() => changeTab("Exchange")} />
+        <NavItem icon="⛏" label="Mine" active={activeTab === "Mine"} onClick={() => changeTab("Mine")} />
+        <NavItem icon="♟" label="Friends" active={activeTab === "Friends"} onClick={() => changeTab("Friends")} />
+        <NavItem icon="☷" label="Earn" active={activeTab === "Earn"} onClick={() => changeTab("Earn")} />
+        <NavItem icon="◎" label="Airdrop" active={activeTab === "Airdrop"} onClick={() => changeTab("Airdrop")} />
       </nav>
 
-      {/* ================= ADMIN PANEL MODAL ================= */}
       {showAdminPanel && (
         <div className="modal-overlay center" onClick={() => setShowAdminPanel(false)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
@@ -249,12 +204,7 @@ export default function AirDrop() {
                 <h3>🛡️ Admin Control Panel</h3>
                 <p>Manage users, visits &amp; withdrawals</p>
               </div>
-              <button
-                className="close-button"
-                onClick={() => setShowAdminPanel(false)}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={() => setShowAdminPanel(false)}>×</button>
             </div>
 
             <div className="admin-stats-grid">
@@ -264,9 +214,7 @@ export default function AirDrop() {
               </div>
               <div className="stat-box">
                 <span>Pending Withdraws</span>
-                <strong>
-                  {withdrawRequests.filter((r) => r.status === "Pending").length}
-                </strong>
+                <strong>{withdrawRequests.filter((r) => r.status === "Pending").length}</strong>
               </div>
             </div>
 
@@ -281,29 +229,15 @@ export default function AirDrop() {
                     <div className="req-info">
                       <strong>{req.id}</strong> — {req.amount} USDT
                       <br />
-                      <small>
-                        {req.method} | <code>{req.account}</code>
-                      </small>
+                      <small>{req.method} | <code>{req.account}</code></small>
                       <br />
-                      <span className={`status-badge ${req.status.toLowerCase()}`}>
-                        {req.status}
-                      </span>
+                      <span className={`status-badge ${req.status.toLowerCase()}`}>{req.status}</span>
                     </div>
 
                     {req.status === "Pending" && (
                       <div className="req-actions">
-                        <button
-                          className="approve-btn"
-                          onClick={() => handleApprove(req.id)}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          className="reject-btn"
-                          onClick={() => handleReject(req.id, req.amount)}
-                        >
-                          Reject
-                        </button>
+                        <button className="approve-btn" onClick={() => handleApprove(req.id)}>Approve</button>
+                        <button className="reject-btn" onClick={() => handleReject(req.id, req.amount)}>Reject</button>
                       </div>
                     )}
                   </div>
@@ -311,59 +245,38 @@ export default function AirDrop() {
               )}
             </div>
 
-            <button
-              className="confirm-button"
-              style={{ marginTop: "15px" }}
-              onClick={() => setShowAdminPanel(false)}
-            >
+            <button className="confirm-button" style={{ marginTop: "15px" }} onClick={() => setShowAdminPanel(false)}>
               Close Admin Panel
             </button>
           </div>
         </div>
       )}
 
-      {/* ================= WALLET MODAL ================= */}
       {showWallet && (
         <div className="modal-overlay" onClick={() => setShowWallet(false)}>
           <div className="wallet-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-top">
               <div className="modal-logo">◇</div>
-              <button
-                className="close-button"
-                onClick={() => setShowWallet(false)}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={() => setShowWallet(false)}>×</button>
             </div>
-
             <div className="modal-title">
               <h3>Connect your wallet</h3>
               <p>Demo wallet connection interface</p>
             </div>
-
-            <button
-              className="telegram-wallet"
-              onClick={() => alert("Demo mode: Telegram Wallet connection is not enabled.")}
-            >
+            <button className="telegram-wallet" onClick={() => alert("Demo mode: Telegram Wallet not enabled.")}>
               <span>💳 Open Wallet in Telegram</span>
               <span>✈</span>
             </button>
-
             <div className="wallet-grid">
               <WalletOption icon="💎" name="Tonkeeper" />
               <WalletOption icon="🔷" name="MyTonWallet" />
               <WalletOption icon="📈" name="Wallet" />
               <WalletOption icon="🟣" name="Tonhub" />
             </div>
-
-            <div className="demo-note">
-              Demo interface — no seed phrase or private key is requested.
-            </div>
           </div>
         </div>
       )}
 
-      {/* ================= WITHDRAW MODAL ================= */}
       {showWithdraw && (
         <div className="modal-overlay center" onClick={() => setShowWithdraw(false)}>
           <div className="withdraw-modal" onClick={(e) => e.stopPropagation()}>
@@ -372,34 +285,21 @@ export default function AirDrop() {
                 <h3>Withdraw Cash</h3>
                 <p>Demo withdrawal form</p>
               </div>
-              <button
-                className="close-button"
-                onClick={() => setShowWithdraw(false)}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={() => setShowWithdraw(false)}>×</button>
             </div>
-
             <div className="available-balance">
               Available Balance
               <strong>{balance.toFixed(2)} USDT</strong>
             </div>
-
             <form onSubmit={handleWithdraw} className="withdraw-form">
               <label>
                 Payment Method
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                >
+                <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
                   {PAYMENT_METHODS.map((method) => (
-                    <option key={method} value={method}>
-                      {method}
-                    </option>
+                    <option key={method} value={method}>{method}</option>
                   ))}
                 </select>
               </label>
-
               <label>
                 UID / Wallet / Number
                 <input
@@ -409,7 +309,6 @@ export default function AirDrop() {
                   placeholder="আপনার বিকাশ/নগদ বা ওয়ালেট নম্বর দিন..."
                 />
               </label>
-
               <label>
                 Amount (USDT)
                 <input
@@ -421,16 +320,12 @@ export default function AirDrop() {
                   placeholder="কমপক্ষে 10"
                 />
               </label>
-
-              <button type="submit" className="confirm-button">
-                Confirm Demo Withdraw
-              </button>
+              <button type="submit" className="confirm-button">Confirm Demo Withdraw</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* ================= CSS ================= */}
       <style>{`
         * { box-sizing: border-box; }
         body { margin: 0; background: #020407; font-family: Arial, Helvetica, sans-serif; }
@@ -471,8 +366,6 @@ export default function AirDrop() {
         .page-card h3 { margin: 0 0 8px; font-size: 23px; }
         .page-card p { margin: 0 0 20px; color: #9ca3af; line-height: 1.6; font-size: 13px; }
         .back-button { border: 0; border-radius: 12px; padding: 11px 22px; color: #fff; background: linear-gradient(90deg, #2563eb, #4f46e5); font-weight: 800; cursor: pointer; }
-        
-        /* Admin Panel Styles */
         .admin-modal { width: 100%; max-width: 390px; max-height: 85vh; overflow-y: auto; padding: 20px; border: 1px solid #3b82f6; border-radius: 24px; background: #090d16; box-shadow: 0 20px 60px rgba(0,0,0,.8); color: #fff; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; }
         .admin-header h3 { margin: 0; font-size: 18px; color: #60a5fa; }
@@ -494,7 +387,6 @@ export default function AirDrop() {
         .req-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
         .approve-btn { background: #10b981; color: #fff; border: 0; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .reject-btn { background: #ef4444; color: #fff; border: 0; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
-
         .modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: 0; background: rgba(0,0,0,.82); backdrop-filter: blur(5px); }
         .modal-overlay.center { align-items: center; padding: 16px; }
         .wallet-modal { width: 100%; max-width: 420px; padding: 22px; border-radius: 27px 27px 0 0; background: linear-gradient(180deg, #131b29, #0c121d); border-top: 1px solid #263246; }
@@ -510,7 +402,6 @@ export default function AirDrop() {
         .wallet-option { text-align: center; cursor: pointer; }
         .wallet-option-icon { height: 61px; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid #344156; background: #182232; font-size: 25px; }
         .wallet-option-name { display: block; margin-top: 7px; color: #c9d0db; font-size: 10px; font-weight: 700; }
-        .demo-note { margin-top: 20px; padding: 10px; border-radius: 10px; background: #101927; color: #707c8f; text-align: center; font-size: 10px; line-height: 1.5; }
         .withdraw-header { padding-bottom: 13px; margin-bottom: 15px; border-bottom: 1px solid #202b3a; }
         .withdraw-header h3 { margin: 0; font-size: 17px; }
         .withdraw-header p { margin: 4px 0 0; color: #7e899b; font-size: 10px; }
@@ -534,27 +425,16 @@ function AirdropContent({ balance, onEarn, onWithdraw }: { balance: number; onEa
           <span className="usdt-symbol">₮</span>
           <span>USDT BALANCE</span>
         </div>
-        <div className="balance-number">
-          {balance.toFixed(2)}
-          <span> USDT</span>
-        </div>
+        <div className="balance-number">{balance.toFixed(2)}<span> USDT</span></div>
         <div className="usd-value">≈ ${balance.toFixed(2)} USD</div>
         <div className="balance-actions">
-          <button className="earn-button" onClick={onEarn}>
-            Earn More
-          </button>
-          <button className="withdraw-button" onClick={onWithdraw}>
-            Withdraw
-          </button>
+          <button className="earn-button" onClick={onEarn}>Earn More</button>
+          <button className="withdraw-button" onClick={onWithdraw}>Withdraw</button>
         </div>
       </section>
-
       <section className="announcement">
         <div className="announcement-title">📢 ANNOUNCEMENT</div>
-        <p>
-          Complete tasks from the Earn tab to get demo rewards. Minimum demo
-          withdraw limit is <strong>10 USDT</strong>.
-        </p>
+        <p>Complete tasks from the Earn tab to get demo rewards. Minimum demo withdraw limit is <strong>10 USDT</strong>.</p>
       </section>
     </>
   );
@@ -570,11 +450,8 @@ function NavItem({ icon, label, active, onClick }: { icon: string; label: string
 }
 
 function WalletOption({ icon, name }: { icon: string; name: string }) {
-  const handleClick = () => {
-    alert(`Demo mode: ${name} connection is not enabled.`);
-  };
   return (
-    <div className="wallet-option" onClick={handleClick}>
+    <div className="wallet-option" onClick={() => alert(`Demo mode: ${name} connection is not enabled.`)}>
       <div className="wallet-option-icon">{icon}</div>
       <span className="wallet-option-name">{name}</span>
     </div>
@@ -586,7 +463,7 @@ function EarnContent({ onBack }: { onBack: () => void }) {
     <section className="page-card">
       <div className="page-icon">💰</div>
       <h3>Earn</h3>
-      <p>এখানে Demo earning tasks দেখানো যাবে। Task complete করলে test balance বাড়ানোর ব্যবস্থা করা যাবে।</p>
+      <p>এখানে Demo earning tasks দেখানো যাবে।</p>
       <button className="back-button" onClick={onBack}>← Back to Airdrop</button>
     </section>
   );
@@ -597,7 +474,7 @@ function MineContent({ onBack }: { onBack: () => void }) {
     <section className="page-card">
       <div className="page-icon">⛏️</div>
       <h3>Mine</h3>
-      <p>Mining dashboard-এর Demo interface এখানে রাখা হয়েছে।</p>
+      <p>Mining dashboard-এর Demo interface।</p>
       <button className="back-button" onClick={onBack}>← Back to Airdrop</button>
     </section>
   );
@@ -608,7 +485,7 @@ function FriendsContent({ onBack }: { onBack: () => void }) {
     <section className="page-card">
       <div className="page-icon">👥</div>
       <h3>Friends</h3>
-      <p>Referral এবং Friends section-এর জন্য এই Demo screen ব্যবহার করতে পারো।</p>
+      <p>Referral এবং Friends section-এর interface।</p>
       <button className="back-button" onClick={onBack}>← Back to Airdrop</button>
     </section>
   );
@@ -619,7 +496,7 @@ function ExchangeContent({ onBack }: { onBack: () => void }) {
     <section className="page-card">
       <div className="page-icon">🔄</div>
       <h3>Exchange</h3>
-      <p>Exchange section-এর Demo interface। এখানে পরে প্রয়োজনীয় features যোগ করা যাবে।</p>
+      <p>Exchange section-এর Demo interface।</p>
       <button className="back-button" onClick={onBack}>← Back to Airdrop</button>
     </section>
   );
