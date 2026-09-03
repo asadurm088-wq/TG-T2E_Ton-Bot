@@ -20,6 +20,8 @@ const PAYMENT_METHODS = [
   "Binance Pay",
 ];
 
+const ADMIN_PASSCODE = "1234"; // এডমিন প্যানেলের পাসওয়ার্ড (প্রয়োজনে বদলাতে পারেন)
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("Airdrop");
 
@@ -33,6 +35,8 @@ export default function App() {
 
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [inputPassword, setInputPassword] = useState("");
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   const [amount, setAmount] = useState("");
@@ -68,6 +72,23 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("admin_withdraw_requests", JSON.stringify(withdrawRequests));
   }, [withdrawRequests]);
+
+  // Incoming Cash ব্যানারে ক্লিক করলে পাসওয়ার্ড মোডাল আসবে
+  const handleIncomingCashClick = () => {
+    setShowPasswordModal(true);
+    setInputPassword("");
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputPassword === ADMIN_PASSCODE) {
+      setShowPasswordModal(false);
+      setShowAdminPanel(true);
+    } else {
+      alert("❌ ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন।");
+      setInputPassword("");
+    }
+  };
 
   const handleWithdraw = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -122,20 +143,26 @@ export default function App() {
     alert(`❌ রিকোয়েস্ট রিজেক্ট করা হয়েছে এবং ${reqAmount} USDT রিফান্ড করা হয়েছে।`);
   };
 
+  const pendingCount = withdrawRequests.filter((r) => r.status === "Pending").length;
+
   return (
     <div className="wallet-app">
       <main className="main-content">
-        <section
-          className="incoming-card"
-          onClick={() => setShowAdminPanel(true)}
-          title="Open Admin Panel"
-        >
+        {/* দ্বিতীয় ছবির আদলে মূল ইনকামিং ক্যাশ ব্যানার */}
+        <div className="top-banner-row">
+          <div className="withdrawals-badge" onClick={handleIncomingCashClick}>
+            📌 Withdrawals: {pendingCount}
+          </div>
+        </div>
+
+        <section className="incoming-card" onClick={handleIncomingCashClick}>
           <div className="incoming-inner">
-            <h1>Incoming Cash</h1>
+            <h1>INCOMING CASH</h1>
+            <div className="connected-indicator">
+              <span className="dot"></span> Connected
+            </div>
           </div>
         </section>
-
-        <div className="glow-divider" />
 
         <section className="wallet-header">
           <div>
@@ -149,31 +176,31 @@ export default function App() {
         </section>
 
         {activeTab === "Airdrop" && (
-          <section className="balance-card">
-            <div className="balance-label">
-              <span className="usdt-symbol">₮</span>
-              <span>USDT BALANCE</span>
-            </div>
-            <div className="balance-number">{balance.toFixed(2)}<span> USDT</span></div>
-            <div className="usd-value">≈ ${balance.toFixed(2)} USD</div>
-            <div className="balance-actions">
-              <button className="earn-button" onClick={() => setActiveTab("Earn")}>Earn More</button>
-              <button className="withdraw-button" onClick={() => setShowWithdraw(true)}>Withdraw</button>
-            </div>
-          </section>
-        )}
+          <>
+            <section className="balance-card">
+              <div className="balance-label">
+                <span className="usdt-symbol">₮</span>
+                <span>USDT BALANCE</span>
+              </div>
+              <div className="balance-number">{balance.toFixed(2)}<span> USDT</span></div>
+              <div className="usd-value">≈ ${balance.toFixed(2)} USD</div>
+              <div className="balance-actions">
+                <button className="earn-button" onClick={() => setActiveTab("Earn")}>Earn More</button>
+                <button className="withdraw-button" onClick={() => setShowWithdraw(true)}>Withdraw</button>
+              </div>
+            </section>
 
-        {activeTab === "Airdrop" && (
-          <section className="announcement">
-            <div className="announcement-title">📢 ANNOUNCEMENT</div>
-            <p>Complete tasks from the Earn tab to get rewards. Minimum withdraw limit is <strong>10 USDT</strong>.</p>
-          </section>
+            <section className="announcement">
+              <div className="announcement-title">📢 ANNOUNCEMENT</div>
+              <p>Complete tasks from the Earn tab to get instant USDT rewards. Minimum withdraw limit is <strong>10 USDT</strong>.</p>
+            </section>
+          </>
         )}
 
         {activeTab === "Earn" && (
           <section className="page-card">
             <div className="page-icon">💰</div>
-            <h3>Earn</h3>
+            <h3>Earn Section</h3>
             <p>টাস্ক এবং রিওয়ার্ড সেকশন।</p>
             <button className="back-button" onClick={() => setActiveTab("Airdrop")}>← Back</button>
           </section>
@@ -182,7 +209,7 @@ export default function App() {
         {activeTab === "Mine" && (
           <section className="page-card">
             <div className="page-icon">⛏️</div>
-            <h3>Mine</h3>
+            <h3>Mine Section</h3>
             <p>মাইনিং ড্যাশবোর্ড ইন্টারফেস।</p>
             <button className="back-button" onClick={() => setActiveTab("Airdrop")}>← Back</button>
           </section>
@@ -191,7 +218,7 @@ export default function App() {
         {activeTab === "Friends" && (
           <section className="page-card">
             <div className="page-icon">👥</div>
-            <h3>Friends</h3>
+            <h3>Friends Section</h3>
             <p>রেফারেল সিস্টেম সেকশন।</p>
             <button className="back-button" onClick={() => setActiveTab("Airdrop")}>← Back</button>
           </section>
@@ -200,7 +227,7 @@ export default function App() {
         {activeTab === "Exchange" && (
           <section className="page-card">
             <div className="page-icon">🔄</div>
-            <h3>Exchange</h3>
+            <h3>Exchange Section</h3>
             <p>এক্সচেঞ্জ সেকশন ইন্টারফেস।</p>
             <button className="back-button" onClick={() => setActiveTab("Airdrop")}>← Back</button>
           </section>
@@ -211,9 +238,10 @@ export default function App() {
         </section>
       </main>
 
+      {/* দ্বিতীয় ছবির মতো নিচের নেভবার */}
       <nav className="bottom-nav">
         <div className={`nav-item ${activeTab === "Exchange" ? "active" : ""}`} onClick={() => setActiveTab("Exchange")}>
-          <div className="nav-icon">◈</div>
+          <div className="nav-icon">🔶</div>
           <div className="nav-label">Exchange</div>
         </div>
         <div className={`nav-item ${activeTab === "Mine" ? "active" : ""}`} onClick={() => setActiveTab("Mine")}>
@@ -221,19 +249,48 @@ export default function App() {
           <div className="nav-label">Mine</div>
         </div>
         <div className={`nav-item ${activeTab === "Friends" ? "active" : ""}`} onClick={() => setActiveTab("Friends")}>
-          <div className="nav-icon">♟</div>
+          <div className="nav-icon">👥</div>
           <div className="nav-label">Friends</div>
         </div>
         <div className={`nav-item ${activeTab === "Earn" ? "active" : ""}`} onClick={() => setActiveTab("Earn")}>
-          <div className="nav-icon">☷</div>
+          <div className="nav-icon">🪙</div>
           <div className="nav-label">Earn</div>
         </div>
         <div className={`nav-item ${activeTab === "Airdrop" ? "active" : ""}`} onClick={() => setActiveTab("Airdrop")}>
-          <div className="nav-icon">◎</div>
+          <div className="nav-icon">🟡</div>
           <div className="nav-label">Airdrop</div>
         </div>
       </nav>
 
+      {/* পাসওয়ার্ড চাওয়ার মোডাল */}
+      {showPasswordModal && (
+        <div className="modal-overlay center" onClick={() => setShowPasswordModal(false)}>
+          <div className="withdraw-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="withdraw-header">
+              <div>
+                <h3>🔒 Admin Passcode</h3>
+                <p>Enter password to access panel</p>
+              </div>
+              <button className="close-button" onClick={() => setShowPasswordModal(false)}>×</button>
+            </div>
+            <form onSubmit={handlePasswordSubmit} className="withdraw-form" style={{ marginTop: "15px" }}>
+              <label>
+                Passcode (Default: 1234)
+                <input
+                  type="password"
+                  value={inputPassword}
+                  onChange={(e) => setInputPassword(e.target.value)}
+                  placeholder="পাসওয়ার্ড লিখুন..."
+                  autoFocus
+                />
+              </label>
+              <button type="submit" className="confirm-button">Verify &amp; Open</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* এডমিন কন্ট্রোল প্যানেল মোডাল */}
       {showAdminPanel && (
         <div className="modal-overlay center" onClick={() => setShowAdminPanel(false)}>
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
@@ -252,7 +309,7 @@ export default function App() {
               </div>
               <div className="stat-box">
                 <span>Pending Requests</span>
-                <strong>{withdrawRequests.filter((r) => r.status === "Pending").length}</strong>
+                <strong>{pendingCount}</strong>
               </div>
             </div>
 
@@ -290,6 +347,7 @@ export default function App() {
         </div>
       )}
 
+      {/* ওয়ালেট কানেক্ট মোডাল */}
       {showWallet && (
         <div className="modal-overlay" onClick={() => setShowWallet(false)}>
           <div className="wallet-modal" onClick={(e) => e.stopPropagation()}>
@@ -302,19 +360,19 @@ export default function App() {
               <p>Demo wallet connection interface</p>
             </div>
             <div className="wallet-grid">
-              <div className="wallet-option" onClick={() => alert("Tonkeeper connection is not enabled in demo mode.")}>
+              <div className="wallet-option" onClick={() => alert("Tonkeeper connection is not enabled.")}>
                 <div className="wallet-option-icon">💎</div>
                 <span className="wallet-option-name">Tonkeeper</span>
               </div>
-              <div className="wallet-option" onClick={() => alert("MyTonWallet connection is not enabled in demo mode.")}>
+              <div className="wallet-option" onClick={() => alert("MyTonWallet connection is not enabled.")}>
                 <div className="wallet-option-icon">🔷</div>
                 <span className="wallet-option-name">MyTonWallet</span>
               </div>
-              <div className="wallet-option" onClick={() => alert("Wallet connection is not enabled in demo mode.")}>
+              <div className="wallet-option" onClick={() => alert("Wallet connection is not enabled.")}>
                 <div className="wallet-option-icon">📈</div>
                 <span className="wallet-option-name">Wallet</span>
               </div>
-              <div className="wallet-option" onClick={() => alert("Tonhub connection is not enabled in demo mode.")}>
+              <div className="wallet-option" onClick={() => alert("Tonhub connection is not enabled.")}>
                 <div className="wallet-option-icon">🟣</div>
                 <span className="wallet-option-name">Tonhub</span>
               </div>
@@ -323,6 +381,7 @@ export default function App() {
         </div>
       )}
 
+      {/* উইথড্র মোডাল */}
       {showWithdraw && (
         <div className="modal-overlay center" onClick={() => setShowWithdraw(false)}>
           <div className="withdraw-modal" onClick={(e) => e.stopPropagation()}>
@@ -377,15 +436,23 @@ export default function App() {
         body { margin: 0; background: #020407; font-family: Arial, Helvetica, sans-serif; }
         .wallet-app { width: 100%; max-width: 420px; min-height: 100vh; margin: 0 auto; color: #fff; background: radial-gradient(circle at top, #101827 0%, #07090e 35%, #04060a 100%); position: relative; display: flex; flex-direction: column; }
         .main-content { flex: 1; padding: 16px 16px 115px; overflow-x: hidden; }
-        .incoming-card { width: 100%; padding: 4px; border-radius: 19px; background: linear-gradient(90deg, #11c7b7, #386ce8, #9b4fe7, #f59e0b); box-shadow: 0 8px 30px rgba(0,0,0,.45); cursor: pointer; }
-        .incoming-inner { height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 15px; background: linear-gradient(110deg, #071c27, #171729, #30251e); }
-        .incoming-inner h1 { margin: 0; font-family: Georgia, serif; font-style: italic; font-size: 29px; font-weight: 700; background: linear-gradient(90deg, #73e6d8, #e6c8ff, #ffe6a1); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .glow-divider { height: 7px; margin: 20px -12px 17px; background: linear-gradient(90deg, transparent, #22d3ee, #9eeaff, #22d3ee, transparent); box-shadow: 0 0 14px rgba(34,211,238,.7); border-radius: 100px; }
+        
+        .top-banner-row { display: flex; justify-content: flex-start; margin-bottom: 8px; }
+        .withdrawals-badge { background: #131d2e; border: 1px solid #253650; padding: 5px 12px; border-radius: 20px; font-size: 11px; color: #f43f5e; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+
+        .incoming-card { width: 100%; padding: 3px; border-radius: 19px; background: linear-gradient(90deg, #f59e0b, #9b4fe7, #386ce8, #11c7b7); box-shadow: 0 8px 25px rgba(0,0,0,.4); cursor: pointer; margin-bottom: 17px; }
+        .incoming-inner { height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-radius: 16px; background: linear-gradient(110deg, #071c27, #171729, #30251e); }
+        .incoming-inner h1 { margin: 0; font-family: Georgia, serif; font-style: italic; font-size: 21px; font-weight: 700; background: linear-gradient(90deg, #ffe6a1, #e6c8ff, #73e6d8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        .connected-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #34d399; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 5px 10px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .dot { width: 7px; height: 7px; background: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399; }
+
         .wallet-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 17px; }
         .wallet-header h2 { margin: 0; font-size: 27px; font-weight: 900; }
         .wallet-header p { margin: 4px 0 0; color: #858cff; font-size: 13px; font-weight: 600; }
         .connect-button { border: 0; border-radius: 25px; padding: 12px 14px; color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; background: linear-gradient(90deg, #0ea5e9, #2563eb); }
         .ton-icon { margin-right: 5px; font-size: 15px; }
+        
         .balance-card { padding: 19px; border: 1px solid #202c3d; border-radius: 23px; background: linear-gradient(145deg, #111a2b, #0d1422, #080d17); margin-bottom: 17px; }
         .balance-label { display: flex; align-items: center; gap: 9px; color: #a7afbd; font-size: 14px; font-weight: 800; margin-bottom: 13px; }
         .usdt-symbol { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 9px; background: #10b981; color: #00150e; font-weight: 900; }
@@ -396,20 +463,24 @@ export default function App() {
         .earn-button, .withdraw-button { min-height: 50px; border-radius: 15px; border: 0; font-size: 15px; font-weight: 900; cursor: pointer; }
         .earn-button { color: #00150e; background: linear-gradient(90deg, #10c58c, #19c8a4); }
         .withdraw-button { color: #fff; background: #202b3e; border: 1px solid #39465b; }
+        
         .announcement { padding: 20px 18px; text-align: center; border-radius: 21px; border: 1px solid #202b3c; background: #0d131e; margin-bottom: 22px; }
         .announcement-title { margin-bottom: 10px; color: #fbbf24; font-size: 16px; font-weight: 900; }
         .announcement p { margin: 0; color: #a0a8b7; font-size: 13px; line-height: 1.7; }
         .protocol { text-align: center; color: #5d687a; font-size: 12px; padding-top: 3px; }
+        
         .bottom-nav { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); width: calc(100% - 24px); max-width: 396px; padding: 11px 7px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; border: 1px solid #354254; border-radius: 31px; background: linear-gradient(180deg, #252d39, #1b222d); z-index: 40; }
         .nav-item { min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 20px; color: #737d8c; cursor: pointer; }
         .nav-item.active { color: #fff; background: rgba(255,255,255,.045); }
-        .nav-icon { height: 29px; display: flex; align-items: center; font-size: 24px; }
+        .nav-icon { height: 29px; display: flex; align-items: center; font-size: 22px; }
         .nav-label { margin-top: 4px; font-size: 11px; font-weight: 800; }
+        
         .page-card { padding: 28px 20px; text-align: center; border-radius: 23px; border: 1px solid #202b3b; background: linear-gradient(145deg, #111827, #0a101b); margin-bottom: 22px; }
         .page-card .page-icon { font-size: 45px; margin-bottom: 12px; }
         .page-card h3 { margin: 0 0 8px; font-size: 23px; }
         .page-card p { margin: 0 0 20px; color: #9ca3af; font-size: 13px; }
         .back-button { border: 0; border-radius: 12px; padding: 11px 22px; color: #fff; background: linear-gradient(90deg, #2563eb, #4f46e5); font-weight: 800; cursor: pointer; }
+        
         .admin-modal { width: 100%; max-width: 390px; max-height: 85vh; overflow-y: auto; padding: 20px; border: 1px solid #3b82f6; border-radius: 24px; background: #090d16; color: #fff; }
         .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px; }
         .admin-header h3 { margin: 0; font-size: 18px; color: #60a5fa; }
@@ -431,6 +502,7 @@ export default function App() {
         .req-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
         .approve-btn { background: #10b981; color: #fff; border: 0; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .reject-btn { background: #ef4444; color: #fff; border: 0; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        
         .modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.82); backdrop-filter: blur(5px); }
         .modal-overlay.center { align-items: center; padding: 16px; }
         .wallet-modal { width: 100%; max-width: 420px; padding: 22px; border-radius: 27px 27px 0 0; background: #131b29; border-top: 1px solid #263246; }
@@ -445,6 +517,7 @@ export default function App() {
         .wallet-option { text-align: center; cursor: pointer; }
         .wallet-option-icon { height: 61px; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 1px solid #344156; background: #182232; font-size: 25px; }
         .wallet-option-name { display: block; margin-top: 7px; color: #c9d0db; font-size: 10px; font-weight: 700; }
+        
         .withdraw-header { padding-bottom: 13px; margin-bottom: 15px; border-bottom: 1px solid #202b3a; }
         .withdraw-header h3 { margin: 0; font-size: 17px; }
         .withdraw-header p { margin: 4px 0 0; color: #7e899b; font-size: 10px; }
