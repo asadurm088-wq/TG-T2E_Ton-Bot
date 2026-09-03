@@ -94,16 +94,6 @@ export default function AirDrop() {
     setAccountDetails("");
   };
 
-  const resetDemoBalance = () => {
-    const confirmed = window.confirm(
-      "Demo balance কি আবার 124.76 USDT করতে চান?"
-    );
-
-    if (!confirmed) return;
-
-    setBalance(124.76);
-  };
-
   return (
     <div className="wallet-app">
 
@@ -179,21 +169,12 @@ export default function AirDrop() {
           />
         )}
 
-        {/* Demo protocol */}
+        {/* Demo protocol version text only (Button removed) */}
 
         <section className="protocol">
-
           <div>
             Airdrop v2.4.1 Demo Protocol
           </div>
-
-          <button
-            onClick={resetDemoBalance}
-            className="system-node"
-          >
-            🔒 System Node: Active
-          </button>
-
         </section>
 
       </main>
@@ -790,24 +771,6 @@ export default function AirDrop() {
           font-size: 12px;
 
           padding-top: 3px;
-        }
-
-        .system-node {
-          margin-top: 12px;
-
-          padding: 9px 17px;
-
-          border-radius: 12px;
-
-          border: 1px solid #172132;
-
-          background: #070b12;
-
-          color: #657084;
-
-          font-size: 11px;
-
-          cursor: pointer;
         }
 
         /* Bottom nav */
@@ -1505,7 +1468,7 @@ function MineContent({
 
 function FriendsContent({
   onBack,
-}: {
+,}: {
   onBack: () => void;
 }) {
   return (
@@ -1567,4 +1530,4 @@ function ExchangeContent({
 
     </section>
   );
-  }
+}
