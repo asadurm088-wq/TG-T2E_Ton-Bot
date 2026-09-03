@@ -1,91 +1,127 @@
 import React, { useState, useEffect } from 'react';
 
-export function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+export function AirDrop() {
+  const [balance, setBalance] = useState<number>(124.76);
+  const [withdrawAmount, setWithdrawAmount] = useState<string>('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('USDT');
+  const [accountDetails, setAccountDetails] = useState<string>('');
 
-  useEffect(() => {
-    // লোকাল স্টোরেজ থেকে উইথড্র রিকোয়েস্টগুলো লোড করা
-    const savedRequests = localStorage.getItem('withdraw_requests');
-    if (savedRequests) {
-      setWithdrawals(JSON.parse(savedRequests));
-    }
-  }, []);
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
-    // পাসওয়ার্ড চেক (এখানে পাসওয়ার্ড 12345 সেট করা আছে)
-    if (password === '12345') {
-      setIsAuthenticated(true);
-    } else {
-      alert('ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।');
+    const amountNum = parseFloat(withdrawAmount);
+
+    if (isNaN(amountNum) || amountNum < 10) {
+      alert('ন্যূনতম উইথড্র পরিমাণ ১০ USDT বা তার বেশি হতে হবে!');
+      return;
     }
-  };
 
-  const handleStatusChange = (index: number, newStatus: string) => {
-    const updatedWithdrawals = [...withdrawals];
-    updatedWithdrawals[index].status = newStatus;
-    setWithdrawals(updatedWithdrawals);
-    localStorage.setItem('withdraw_requests', JSON.stringify(updatedWithdrawals));
-  };
+    if (amountNum > balance) {
+      alert('আপনার পর্যাপ্ত ব্যালেন্স নেই!');
+      return;
+    }
 
-  if (!isAuthenticated) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a', fontFamily: 'sans-serif' }}>
-        <form onSubmit={handleLogin} style={{ padding: '30px', background: '#1e293b', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', textAlign: 'center', color: '#ffffff', width: '100%', maxWidth: '320px', border: '1px solid #334155' }}>
-          <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>অ্যাডমিন প্যানেল লগইন</h2>
-          <input
-            type="password"
-            placeholder="পাসওয়ার্ড দিন (12345)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ padding: '12px', margin: '0 0 15px 0', width: '100%', display: 'block', backgroundColor: '#0f172a', border: '1px solid #475569', borderRadius: '8px', color: '#ffffff', boxSizing: 'border-box' }}
-          />
-          <button type="submit" style={{ padding: '12px', width: '100%', background: 'linear-gradient(to right, #0284c7, #2563eb)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-            লগইন করুন
-          </button>
-        </form>
-      </div>
-    );
-  }
+    if (!accountDetails) {
+      alert('দয়া করে আপনার ওয়ালেট বা অ্যাকাউন্ট নম্বর দিন!');
+      return;
+    }
+
+    // উইথড্র রিকোয়েস্ট লোকাল স্টোরেজে সেভ করার লজিক
+    const existingRequests = JSON.parse(localStorage.getItem('withdraw_requests') || '[]');
+    const newRequest = {
+      user: accountDetails,
+      amount: `${amountNum} USDT (${selectedPaymentMethod})`,
+      status: 'Pending'
+    };
+    existingRequests.push(newRequest);
+    localStorage.setItem('withdraw_requests', JSON.stringify(existingRequests));
+
+    // ব্যালেন্স আপডেট করা
+    setBalance(balance - amountNum);
+    setWithdrawAmount('');
+    setAccountDetails('');
+    alert('উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!');
+  };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto', color: '#ffffff', backgroundColor: '#0f172a', minHeight: '100vh' }}>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '500px', margin: '0 auto', backgroundColor: '#0f172a', minHeight: '100vh', color: '#ffffff', boxSizing: 'border-box' }}>
+      
+      {/* ১. হেডার */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ fontSize: '18px', margin: 0 }}>অ্যাডমিন ড্যাশবোর্ড - উইথড্র রিকোয়েস্ট</h2>
-        <button onClick={() => setIsAuthenticated(false)} style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>লগআউট</button>
+        <h2 style={{ fontSize: '20px', margin: 0 }}>Airdrop Wallet</h2>
+        <button style={{ backgroundColor: '#0284c7', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+          Connect Wallet
+        </button>
       </div>
 
-      {withdrawals.length === 0 ? (
-        <p style={{ color: '#94a3b8', textAlign: 'center', marginTop: '40px' }}>কোনো উইথড্র রিকোয়েস্ট পাওয়া যায়নি।</p>
-      ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px', backgroundColor: '#1e293b', borderRadius: '8px', overflow: 'hidden' }}>
-            <thead>
-              <tr style={{ background: '#334155', borderBottom: '2px solid #475569', fontSize: '12px' }}>
-                <th style={{ padding: '10px', border: '1px solid #475569' }}>ইউজার/ওয়ালেট</th>
-                <th style={{ padding: '10px', border: '1px solid #475569' }}>অ্যামাউন্ট</th>
-                <th style={{ padding: '10px', border: '1px solid #475569' }}>স্ট্যাটাস</th>
-                <th style={{ padding: '10px', border: '1px solid #475569' }}>অ্যাকশন</th>
-              </tr>
-            </thead>
-            <tbody style={{ fontSize: '12px' }}>
-              {withdrawals.map((req, index) => (
-                <tr key={index} style={{ textAlign: 'center', borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '10px', border: '1px solid #475569' }}>{req.user || 'Unknown'}</td>
-                  <td style={{ padding: '10px', border: '1px solid #475569', color: '#34d399', fontWeight: 'bold' }}>{req.amount}</td>
-                  <td style={{ padding: '10px', border: '1px solid #475569', color: req.status === 'Approved' ? '#34d399' : req.status === 'Rejected' ? '#f87171' : '#fbbf24' }}>{req.status || 'Pending'}</td>
-                  <td style={{ padding: '10px', border: '1px solid #475569' }}>
-                    <button onClick={() => handleStatusChange(index, 'Approved')} style={{ marginRight: '5px', background: '#10b981', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>এপ্রুভ</button>
-                    <button onClick={() => handleStatusChange(index, 'Rejected')} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>বাতিল</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ২. ব্যালেন্স কার্ড */}
+      <div style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155', marginBottom: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#94a3b8', fontSize: '12px', margin: '0 0 5px 0' }}>USDT BALANCE</p>
+        <h1 style={{ fontSize: '32px', color: '#34d399', margin: '0 0 5px 0' }}>{balance.toFixed(2)} USDT</h1>
+        <p style={{ color: '#64748b', fontSize: '11px', margin: 0 }}>≈ ${balance.toFixed(2)} USD</p>
+      </div>
+
+      {/* ৩. উইথড্র ফর্ম */}
+      <form onSubmit={handleWithdraw} style={{ backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #334155', marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '16px', marginBottom: '15px', marginTop: 0 }}>উইথড্র রিকোয়েস্ট পাঠান</h3>
+        
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '5px' }}>পেমেন্ট মেথড</label>
+          <select 
+            value={selectedPaymentMethod} 
+            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+            style={{ width: '100%', padding: '10px', backgroundColor: '#0f172a', border: '1px solid #475569', borderRadius: '8px', color: '#fff', boxSizing: 'border-box' }}
+          >
+            <option value="USDT">USDT (TRC20 / TON)</option>
+            <option value="Bkash">বিকাশ (Bkash)</option>
+            <option value="Nagad">নগদ (Nagad)</option>
+          </select>
         </div>
-      )}
+
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '5px' }}>পরিমাণ (USDT/টাকা)</label>
+          <input 
+            type="number" 
+            placeholder="ন্যূনতম ১০" 
+            value={withdrawAmount} 
+            onChange={(e) => setWithdrawAmount(e.target.value)}
+            style={{ width: '100%', padding: '10px', backgroundColor: '#0f172a', border: '1px solid #475569', borderRadius: '8px', color: '#fff', boxSizing: 'border-box' }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '5px' }}>ওয়ালেট অ্যাড্রেস বা নম্বর</label>
+          <input 
+            type="text" 
+            placeholder="আপনার অ্যাকাউন্ট নম্বর দিন" 
+            value={accountDetails} 
+            onChange={(e) => setAccountDetails(e.target.value)}
+            style={{ width: '100%', padding: '10px', backgroundColor: '#0f172a', border: '1px solid #475569', borderRadius: '8px', color: '#fff', boxSizing: 'border-box' }}
+          />
+        </div>
+
+        <button type="submit" style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+          Withdraw Confirm
+        </button>
+      </form>
+
+      {/* ৪. ঘোষণা */}
+      <div style={{ backgroundColor: '#1e293b', padding: '15px', borderRadius: '12px', border: '1px solid #334155', textAlign: 'center', marginBottom: '20px' }}>
+        <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
+          📢 Complete tasks from the Earn tab to get rewards. Minimum demo withdraw limit is <strong style={{ color: '#34d399' }}>10 USDT</strong>.
+        </p>
+      </div>
+
+      {/* ৫. সিক্রেট অ্যাডমিন প্যানেল ট্রিগার বাটন (সরাসরি /admin এ নিয়ে যাবে) */}
+      <div style={{ textAlign: 'center', paddingBottom: '10px', marginTop: '10px' }}>
+        <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Airdrop v2.4.1 Secure Protocol</div>
+        <div 
+          onClick={() => window.location.href = '/admin'}
+          style={{ display: 'inline-block', padding: '8px 16px', backgroundColor: '#0a0d14', border: '1px solid #334155', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', color: '#34d399', fontWeight: 'bold' }}
+        >
+          🔒 Open Admin Panel
+        </div>
+      </div>
+
     </div>
   );
 }
